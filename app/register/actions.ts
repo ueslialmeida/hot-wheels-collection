@@ -4,11 +4,14 @@ import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 
-export async function register(formData: FormData) {
+export async function signup(formData: FormData) {
   const supabase = await createClient()
+
+  console.log('CHEGOU AQUI!')
 
   // TODO: validate inputs
   const data = {
+    name: formData.get('name') as string,
     email: formData.get('email') as string,
     password: formData.get('password') as string,
   }

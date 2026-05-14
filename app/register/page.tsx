@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import Link from 'next/link';
+import { signup } from './actions';
 
 // Schema de validação com Zod
 const registerSchema = z.object({
@@ -25,11 +26,11 @@ export default function RegisterPage() {
     resolver: zodResolver(registerSchema),
   });
 
-  const onSubmit = async (data: RegisterFormData) => {
-    // Simulação de chamada de API
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    console.log('Dados de registro:', data);
-  };
+  // const onSubmit = async (data: RegisterFormData) => {
+  //   // Simulação de chamada de API
+  //   await new Promise((resolve) => setTimeout(resolve, 2000));
+  //   console.log('Dados de registro:', data);
+  // };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
@@ -48,7 +49,7 @@ export default function RegisterPage() {
           </p>
         </div>
 
-        <form className="mt-8 space-y-5" onSubmit={handleSubmit(onSubmit)}>
+        <form className="mt-8 space-y-5" >
           <div className="space-y-4">
             {/* Campo Nome */}
             <div>
@@ -105,6 +106,7 @@ export default function RegisterPage() {
           </div>
 
           <button
+            formAction={signup}
             type="submit"
             disabled={isSubmitting}
             className="group relative w-full flex justify-center py-2.5 px-4 border border-transparent text-sm font-semibold rounded-lg text-white bg-slate-900 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed"
