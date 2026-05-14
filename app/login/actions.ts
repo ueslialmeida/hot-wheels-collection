@@ -2,10 +2,10 @@
 
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
-import { createClient } from "@/lib/supabase/client"
+import { getSupabaseServerClient } from "@/lib/supabase/server-client"
 
 export async function login(formData: FormData) {
-    const supabase = await createClient()
+    const supabase = await getSupabaseServerClient()
 
     // TODO: validate inputs
     const data = {

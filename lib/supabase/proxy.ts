@@ -28,7 +28,20 @@ export async function updateSession(request: NextRequest) {
     }
   )
 
-  await supabase.auth.getClaims()
+  // Recupera o usuário atual
+  const { data: { user } } = await supabase.auth.getUser()
+
+  // Se não houver usuário e ele tentar acessar /dashboard
+  if (!user && request.nextUrl.pathname.startsWith('/dashboard')) {
+    return NextResponse.redirect(new URL('/login', request.url))
+  }
+
+  // Se usuário logado redirecionar para dashboard caso tente acessar login ou register
+  const isAuthPage = request.nextUrl.pathname.startsWith('/login') || request.nextUrl.pathname.startsWith('/register')
+
+  if (user && isAuthPage) {
+    return NextResponse.redirect(new URL('/dashboard', request.url))
+  }
 
   return supabaseResponse
 }

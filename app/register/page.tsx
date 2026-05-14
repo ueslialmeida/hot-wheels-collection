@@ -26,12 +26,6 @@ export default function RegisterPage() {
     resolver: zodResolver(registerSchema),
   });
 
-  // const onSubmit = async (data: RegisterFormData) => {
-  //   // Simulação de chamada de API
-  //   await new Promise((resolve) => setTimeout(resolve, 2000));
-  //   console.log('Dados de registro:', data);
-  // };
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
       <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-2xl shadow-lg border border-slate-100">
@@ -45,7 +39,7 @@ export default function RegisterPage() {
             Crie sua conta
           </h2>
           <p className="mt-2 text-sm text-slate-600">
-            Junte-se a nós e comece a sua jornada hoje mesmo.
+            Junte-se a nós e comece a sua garagem hoje mesmo.
           </p>
         </div>
 
