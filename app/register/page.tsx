@@ -53,6 +53,7 @@ export default function RegisterPage() {
                   <User className="h-5 w-5 text-slate-400" />
                 </div>
                 <input
+                id='name'
                   {...register('name')}
                   className={`block text-slate-800 w-full pl-10 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 transition-all sm:text-sm
                     ${errors.name ? 'border-red-500 focus:ring-red-200' : 'border-slate-300 focus:ring-blue-500 focus:border-transparent'}`}
@@ -70,6 +71,7 @@ export default function RegisterPage() {
                   <Mail className="h-5 w-5 text-slate-400" />
                 </div>
                 <input
+                id='email'
                   {...register('email')}
                   type="email"
                   className={`block text-slate-800 w-full pl-10 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 transition-all sm:text-sm
@@ -88,6 +90,7 @@ export default function RegisterPage() {
                   <Lock className="h-5 w-5 text-slate-400" />
                 </div>
                 <input
+                  id='password'
                   {...register('password')}
                   type="password"
                   className={`block text-slate-800 w-full pl-10 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 transition-all sm:text-sm
@@ -100,6 +103,7 @@ export default function RegisterPage() {
           </div>
 
           <button
+          id='register'
             formAction={signup}
             type="submit"
             disabled={isSubmitting}
