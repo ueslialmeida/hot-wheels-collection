@@ -12,6 +12,6 @@ describe('template spec', () => {
     cy.get('#register').click()
 
     cy.get('h2').should('contain.text', 'Minha Garagem')
-    cy.get('p').should('contain.text', /Você tem \d carrinhos na coleção/)
+    cy.contains(/Você tem \d carrinhos na coleção/)
   })
 })
