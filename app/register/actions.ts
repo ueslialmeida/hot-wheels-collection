@@ -24,6 +24,6 @@ export async function signup(formData: FormData) {
     redirect('/error')
   }
 
-  revalidatePath('/register')
+  revalidatePath('/dashboard')
   redirect('/login')
 }
