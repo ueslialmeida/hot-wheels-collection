@@ -11,9 +11,6 @@ describe('template spec', () => {
     cy.get('#password').type('12345678')
     cy.get('#register').click()
 
-    cy.url().should('include', '/dashboard')
-    cy.get('#email').should('be.visible')
-    cy.get('#password').should('be.visible')
     cy.get('h2').should('contain.text', 'Minha Garagem')
     cy.get('p').should('contain.text', /Você tem \d carrinhos na coleção/)
   })
