@@ -1,5 +1,6 @@
 describe('template spec', () => {
   it('passes', () => {
-    cy.visit('https://example.cypress.io')
+    cy.visit('/')
+    cy.get('h2').should('contain.text', 'Bem-vindo de volta')
   })
 })
