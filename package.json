@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test:cypress:ci": "start-server-and-test dev http://localhost:3000 'cypress run'"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -23,8 +24,10 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "cypress": "^15.15.0",
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
+    "start-server-and-test": "^3.0.5",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
