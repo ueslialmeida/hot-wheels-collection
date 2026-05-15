@@ -28,6 +28,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
     "start-server-and-test": "^3.0.5",
+    "supabase": "^2.98.2",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
