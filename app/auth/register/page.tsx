@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useActionState } from 'react';
 import { User, Mail, Lock, ArrowRight, Sparkles } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -11,13 +11,15 @@ import { signup } from './actions';
 // Schema de validação com Zod
 const registerSchema = z.object({
   name: z.string().min(2, 'O nome deve ter pelo menos 2 caracteres'),
-  email: z.string().email('Insira um e-mail válido'),
+  email: z.email('Insira um e-mail válido'),
   password: z.string().min(8, 'A senha deve ter pelo menos 8 caracteres'),
 });
 
 type RegisterFormData = z.infer<typeof registerSchema>;
 
 export default function RegisterPage() {
+  const [state, formAction, isPending] = useActionState(signup, undefined)
+
   const {
     register,
     handleSubmit,
@@ -30,17 +32,27 @@ export default function RegisterPage() {
     <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
       <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-2xl shadow-lg border border-slate-100">
         
-        {/* Header com um toque visual extra */}
+        {/* Header */}
         <div className="text-center">
-          <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 rounded-full mb-4">
-            <Sparkles className="h-6 w-6 text-blue-600" />
-          </div>
-          <h2 className="text-3xl font-extrabold text-slate-900">
+          <h1 className="text-4xl font-black italic text-slate-900 tracking-tighter uppercase">
+            HW <span className="text-orange-500">Collector</span>
+          </h1>
+          <h2 className="mt-6 text-2xl font-extrabold text-slate-900">
             Crie sua conta
           </h2>
           <p className="mt-2 text-sm text-slate-600">
             Junte-se a nós e comece a sua garagem hoje mesmo.
           </p>
+          {state?.success && (
+            <div className="bg-green-50 mt-4 text-green-800 border border-green-200 rounded-lg p-3 text-sm font-medium text-center mb-4 w-full">
+                {state.message}
+            </div>
+          )}
+          {state?.success === false && (
+            <div className="bg-red-50 mt-4 text-red-800 border border-red-200 rounded-lg p-3 text-sm font-medium text-center mb-4 w-full">
+                {state?.message}
+            </div>
+          )}
         </div>
 
         <form className="mt-8 space-y-5" >
@@ -54,6 +66,8 @@ export default function RegisterPage() {
                 </div>
                 <input
                 id='name'
+                type="text"
+                required
                   {...register('name')}
                   className={`block text-slate-800 w-full pl-10 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 transition-all sm:text-sm
                     ${errors.name ? 'border-red-500 focus:ring-red-200' : 'border-slate-300 focus:ring-blue-500 focus:border-transparent'}`}
@@ -65,7 +79,7 @@ export default function RegisterPage() {
 
             {/* Campo Email */}
             <div>
-              <label className="block text-sm font-medium text-slate-700">E-mail profissional</label>
+              <label className="block text-sm font-medium text-slate-700">E-mail</label>
               <div className="mt-1 relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Mail className="h-5 w-5 text-slate-400" />
@@ -74,6 +88,7 @@ export default function RegisterPage() {
                 id='email'
                   {...register('email')}
                   type="email"
+                  required
                   className={`block text-slate-800 w-full pl-10 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 transition-all sm:text-sm
                     ${errors.email ? 'border-red-500 focus:ring-red-200' : 'border-slate-300 focus:ring-blue-500 focus:border-transparent'}`}
                   placeholder="exemplo@email.com"
@@ -93,6 +108,7 @@ export default function RegisterPage() {
                   id='password'
                   {...register('password')}
                   type="password"
+                  required
                   className={`block text-slate-800 w-full pl-10 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 transition-all sm:text-sm
                     ${errors.password ? 'border-red-500 focus:ring-red-200' : 'border-slate-300 focus:ring-blue-500 focus:border-transparent'}`}
                   placeholder="No mínimo 8 caracteres"
@@ -104,7 +120,7 @@ export default function RegisterPage() {
 
           <button
           id='register'
-            formAction={signup}
+            formAction={formAction}
             type="submit"
             disabled={isSubmitting}
             className="group relative w-full flex justify-center py-2.5 px-4 border border-transparent text-sm font-semibold rounded-lg text-white bg-slate-900 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed"
@@ -117,7 +133,7 @@ export default function RegisterPage() {
         <div className="text-center mt-6">
           <p className="text-sm text-slate-600">
             Já possui uma conta?{' '}
-            <Link href="/login" className="font-semibold text-blue-600 hover:text-blue-500 transition-colors">
+            <Link href="/auth/login" className="font-semibold text-blue-600 hover:text-blue-500 transition-colors">
               Fazer login
             </Link>
           </p>

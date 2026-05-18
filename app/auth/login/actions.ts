@@ -1,0 +1,33 @@
+'use server'
+
+import { revalidatePath } from "next/cache"
+import { redirect } from "next/navigation"
+import { getSupabaseServerClient } from "@/lib/supabase/server-client"
+
+export async function login(prevState: {error: string | null}, formData: FormData) {
+    const supabase = await getSupabaseServerClient()
+
+    // TODO: validate inputs
+    const data = {
+        email: formData.get('email') as string,
+        password: formData.get('password') as string,
+    }
+
+    const{ error } = await supabase.auth.signInWithPassword(data)
+
+    if (error) {
+      switch (error.code) {
+        case 'invalid_credentials':
+            return {error: 'E-mail ou senha incorretos.'}
+        case 'email_not_confirmed':
+            return {error: 'Por favor, confirme seu e-mail antes de fazer login.'}
+        case 'rate_limit_exceeded':
+            return {error: 'Muitas tentativas. Tente novamente mais tarde.'}
+        default:
+          return {error: error.message}
+      }
+    }
+
+    revalidatePath('/auth/login')
+    redirect('/dashboard')
+}

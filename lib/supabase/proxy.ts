@@ -33,11 +33,17 @@ export async function updateSession(request: NextRequest) {
 
   // Se não houver usuário e ele tentar acessar /dashboard
   if (!user && request.nextUrl.pathname.startsWith('/dashboard')) {
-    return NextResponse.redirect(new URL('/login', request.url))
+    return NextResponse.redirect(new URL('/auth/login', request.url))
   }
 
+  const urls = [
+    '/auth/login',
+    '/auth/register',
+    '/auth/reset-password',
+  ]
+
   // Se usuário logado redirecionar para dashboard caso tente acessar login ou register
-  const isAuthPage = request.nextUrl.pathname.startsWith('/login') || request.nextUrl.pathname.startsWith('/register')
+  const isAuthPage = urls.some(url => request.nextUrl.pathname.startsWith(url))
 
   if (user && isAuthPage) {
     return NextResponse.redirect(new URL('/dashboard', request.url))

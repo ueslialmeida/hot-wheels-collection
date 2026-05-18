@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Car, Search, Plus, Hash, Calendar, Layers, Palette, ListOrdered } from 'lucide-react';
 import CarModal from '../components/CarModal';
 import { CarFormData } from '../types/Car.types';
+import { signOut } from '../auth/logout/action';
 
 // Dados com a nova estrutura detalhada
 const hotWheelsCollection = [
@@ -72,7 +73,11 @@ export default function HotWheelsDashboard() {
       <div className="max-w-7xl mx-auto mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
           <h2 className="text-2xl font-black text-slate-900 tracking-tighter uppercase">
-            Minha Garagem
+            Minha Garagem | 
+            <button onClick={signOut} 
+                className="text-xl ml-2 mb-2 font-bold text-slate-700 hover:text-orange-600 transition-colors uppercase">
+                Sair da Garagem
+              </button>
           </h2>
           <p className="text-slate-500">Você tem {hotWheelsCollection.length} carrinhos na coleção</p>
         </div>
