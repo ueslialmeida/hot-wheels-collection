@@ -5,7 +5,7 @@ describe('template spec', () => {
   })
 
   it('should create an account and auto-login', () => {
-    cy.visit('http://localhost:3000/register')
+    cy.visit('http://localhost:3000/auth/register')
     cy.get('#name').type('Uesli Almeida')
     cy.get('#email').type('almeida.uesli@gmail.com')
     cy.get('#password').type('12345678')

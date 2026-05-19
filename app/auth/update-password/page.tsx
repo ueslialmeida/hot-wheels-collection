@@ -34,7 +34,7 @@ export default function UpdatePasswordPage() {
         </div>
 
         {/* Form */}
-        {state?.success === null &&(
+        {state?.success === null || state?.success === false ?(
         <form className="mt-8 space-y-6" action="#" method="POST">
           <div className="space-y-4">
             <div>
@@ -70,9 +70,9 @@ export default function UpdatePasswordPage() {
               <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-200" />
             </button>
           </div>
-        </form>)}
-        {state?.success && (
-            <div>
+        </form>) 
+        :
+        <div>
             <a
               id='login'
               href="/dashboard"
@@ -81,8 +81,7 @@ export default function UpdatePasswordPage() {
               Ir para sua Garagem
               <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-200" />
             </a>
-          </div>
-        )}
+          </div>}
       </div>
     </div>
   );
