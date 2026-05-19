@@ -3,15 +3,17 @@
 import React, { useEffect } from 'react';
 import { X, Save, Car, Hash, Calendar, Layers, Palette, ListOrdered, Tag } from 'lucide-react';
 import { useForm } from 'react-hook-form';
-import { CarFormData } from '../types/Car.types';
+import { CarFormData } from '../types/Car';
+import { addCarToCollection, updateCarInCollection } from './actions';
 
 interface CarModalProps {
   isOpen: boolean;
   onClose: () => void;
   initialData?: CarFormData | null; // dados do carro selecionado
+  onSuccess: (data: CarFormData, isEditing: boolean) => void;
 }
 
-export default function CarModal({ isOpen, onClose, initialData }: CarModalProps) {
+export default function CarModal({ isOpen, onClose, initialData, onSuccess }: CarModalProps) {
   const isEditing = !!initialData;
   const { register, handleSubmit, reset, formState: { errors } } = useForm<CarFormData>(
     {
@@ -28,13 +30,14 @@ export default function CarModal({ isOpen, onClose, initialData }: CarModalProps
       } else {
         // Reseta para valores vazios ao adicionar novo
         reset({
-          modelo: '',
-          codigoModelo: '',
-          ano: undefined,
+          id: undefined,
+          modelName: '',
+          modelCode: '',
+          collectionYear: undefined,
           serie: '',
-          cor: '',
-          numColecaoAnual: '',
-          numNaSerie: ''
+          color: '',
+          numberInYearCollection: '',
+          numberInSerie: ''
         });
       }
     }
@@ -42,12 +45,15 @@ export default function CarModal({ isOpen, onClose, initialData }: CarModalProps
 
   if (!isOpen) return null;
 
-  const onSubmit = (data: CarFormData) => {
+  const onSubmit = async (data: CarFormData) => {
     if (isEditing) {
-      console.log("Atualizando item ID:", initialData.id, data);
+      await updateCarInCollection(data)
+      onSuccess(data, isEditing);
     } else {
-      console.log("Novo carrinho adicionado:", data);
+      const savedCar = await addCarToCollection(data)
+      onSuccess(savedCar, isEditing);
     }
+    
     reset(); // Limpa o formulário
     onClose(); // Fecha o modal
   };
@@ -63,10 +69,10 @@ export default function CarModal({ isOpen, onClose, initialData }: CarModalProps
               <Car size={24} />
             </div>
             <h2 className="text-xl font-bold italic uppercase tracking-tighter">
-              {isEditing ? `Editando: ${initialData.modelo}` : 'Novo na Garagem'}
+              {isEditing ? `Editando: ${initialData.modelName}` : 'Novo na Garagem'}
             </h2>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors">
+          <button id="close-modal" onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors">
             <X size={24} />
           </button>
         </div>
@@ -74,14 +80,28 @@ export default function CarModal({ isOpen, onClose, initialData }: CarModalProps
         {/* Formulário */}
         <form onSubmit={handleSubmit(onSubmit)} className="p-8 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            {/* ID carrinho */}
+            <div className="hidden md:col-span-2">
+              <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">ID do Registro</label>
+              <div className="relative">
+                <Tag className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                <input
+                  id="register-id"
+                  {...register('id')}
+                  className="w-full pl-10 pr-4 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-orange-500 outline-none transition-all"
+                />
+              </div>
+            </div>
             
             {/* Nome do Modelo */}
             <div className="md:col-span-2">
               <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Nome do Modelo</label>
               <div className="relative">
                 <Tag className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                <input 
-                  {...register('modelo', { required: true })}
+                <input
+                  id="model-name"
+                  {...register('modelName', { required: true })}
                   className="w-full pl-10 pr-4 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-orange-500 outline-none transition-all"
                   placeholder="Ex: Nissan Skyline GT-R (R34)"
                 />
@@ -94,7 +114,8 @@ export default function CarModal({ isOpen, onClose, initialData }: CarModalProps
               <div className="relative">
                 <Hash className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                 <input 
-                  {...register('codigoModelo', { required: true })}
+                  id="model-code"
+                  {...register('modelCode')}
                   className="w-full pl-10 pr-4 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-orange-500 outline-none transition-all"
                   placeholder="Ex: HNK34"
                 />
@@ -107,7 +128,8 @@ export default function CarModal({ isOpen, onClose, initialData }: CarModalProps
               <div className="relative">
                 <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                 <input 
-                  {...register('ano', { required: true })}
+                  id="collection-year"
+                  {...register('collectionYear')}
                   type="number"
                   className="w-full pl-10 pr-4 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-orange-500 outline-none transition-all"
                   placeholder="2024"
@@ -121,7 +143,8 @@ export default function CarModal({ isOpen, onClose, initialData }: CarModalProps
               <div className="relative">
                 <Layers className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                 <input 
-                  {...register('serie', { required: true })}
+                  id="serie"
+                  {...register('serie')}
                   className="w-full pl-10 pr-4 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-orange-500 outline-none transition-all"
                   placeholder="Ex: J-Imports"
                 />
@@ -134,7 +157,8 @@ export default function CarModal({ isOpen, onClose, initialData }: CarModalProps
               <div className="relative">
                 <Palette className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                 <input 
-                  {...register('cor', { required: true })}
+                  id="color"
+                  {...register('color')}
                   className="w-full pl-10 pr-4 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-orange-500 outline-none transition-all"
                   placeholder="Ex: Bayside Blue"
                 />
@@ -147,7 +171,8 @@ export default function CarModal({ isOpen, onClose, initialData }: CarModalProps
               <div className="relative">
                 <ListOrdered className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                 <input 
-                  {...register('numColecaoAnual', { required: true })}
+                  id="number-in-year-collection"
+                  {...register('numberInYearCollection')}
                   className="w-full pl-10 pr-4 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-orange-500 outline-none transition-all"
                   placeholder="000/250"
                 />
@@ -160,7 +185,8 @@ export default function CarModal({ isOpen, onClose, initialData }: CarModalProps
               <div className="relative">
                 <ListOrdered className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                 <input 
-                  {...register('numNaSerie', { required: true })}
+                  id="number-in-serie"
+                  {...register('numberInSerie')}
                   className="w-full pl-10 pr-4 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-orange-500 outline-none transition-all"
                   placeholder="0/10"
                 />
@@ -171,6 +197,7 @@ export default function CarModal({ isOpen, onClose, initialData }: CarModalProps
           {/* Footer / Botões */}
           <div className="pt-6 flex gap-4">
             <button 
+              id="cancel"
               type="button"
               onClick={onClose}
               className="flex-1 py-4 bg-slate-100 text-slate-600 font-bold rounded-2xl hover:bg-slate-200 transition-colors uppercase text-sm tracking-widest"
@@ -178,6 +205,7 @@ export default function CarModal({ isOpen, onClose, initialData }: CarModalProps
               Cancelar
             </button>
             <button 
+              id="save"
               type="submit"
               className="flex-1 py-4 bg-orange-500 text-white font-bold rounded-2xl hover:bg-orange-600 transition-shadow shadow-lg shadow-orange-200 uppercase text-sm tracking-widest flex items-center justify-center gap-2"
             >
