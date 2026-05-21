@@ -7,4 +7,5 @@ export interface CarFormData {
   color: string;
   numberInYearCollection: string;
   numberInSerie: string;
+  imageUrl: string;
 }

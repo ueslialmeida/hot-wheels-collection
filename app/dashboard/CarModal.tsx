@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { X, Save, Car, Hash, Calendar, Layers, Palette, ListOrdered, Tag } from 'lucide-react';
+import { X, Save, Car, Hash, Calendar, Layers, Palette, ListOrdered, Tag, FileImage } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { CarFormData } from '../types/Car';
 import { addCarToCollection, updateCarInCollection } from './actions';
@@ -37,7 +37,8 @@ export default function CarModal({ isOpen, onClose, initialData, onSuccess }: Ca
           serie: '',
           color: '',
           numberInYearCollection: '',
-          numberInSerie: ''
+          numberInSerie: '',
+          imageUrl: ''
         });
       }
     }
@@ -189,6 +190,20 @@ export default function CarModal({ isOpen, onClose, initialData, onSuccess }: Ca
                   {...register('numberInSerie')}
                   className="w-full pl-10 pr-4 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-orange-500 outline-none transition-all"
                   placeholder="0/10"
+                />
+              </div>
+            </div>
+
+            {/* URL da Imagem */}
+            <div className="md:col-span-2">
+              <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">URL da Imagem</label>
+              <div className="relative">
+                <FileImage className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                <input
+                  id="image-url"
+                  {...register('imageUrl', { required: true })}
+                  className="w-full pl-10 pr-4 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-orange-500 outline-none transition-all"
+                  placeholder="https://example.com/image.jpg"
                 />
               </div>
             </div>

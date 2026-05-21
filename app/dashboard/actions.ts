@@ -20,6 +20,7 @@ export async function addCarToCollection(carData: CarFormData) {
         in_year_collection_number: carData.numberInYearCollection as string,
         in_series_collection_number: carData.numberInSerie as string,
         color: carData.color as string,
+        image_url: carData.imageUrl as string,
         series_title: carData.serie as string,
         collection_year: Number(carData.collectionYear),
         user_id: user.id
@@ -44,6 +45,7 @@ export async function addCarToCollection(carData: CarFormData) {
         collectionYear: newCar.collection_year,
         serie: newCar.series_title,
         color: newCar.color,
+        imageUrl: newCar.image_url,
         numberInYearCollection: newCar.in_year_collection_number,
         numberInSerie: newCar.in_series_collection_number
     };
@@ -73,6 +75,7 @@ export async function getCarsInCollection() {
         numberInYearCollection: car.in_year_collection_number,
         numberInSerie: car.in_series_collection_number,
         color: car.color,
+        imageUrl: car.image_url,
         serie: car.series_title,
         collectionYear: car.collection_year
     }))
@@ -95,6 +98,7 @@ export async function updateCarInCollection(carData: CarFormData) {
             in_year_collection_number: carData.numberInYearCollection,
             in_series_collection_number: carData.numberInSerie,
             color: carData.color,
+            image_url: carData.imageUrl,
             series_title: carData.serie,
             collection_year: carData.collectionYear
         })
