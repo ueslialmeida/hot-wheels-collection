@@ -1,5 +1,5 @@
 export interface CarFormData {
-  id?: number;
+  id?: string;
   modelName: string;
   modelCode: string;
   collectionYear: number;

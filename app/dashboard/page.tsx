@@ -1,12 +1,11 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { Car, Search, Plus, Hash, Calendar, Layers, Palette, ListOrdered } from 'lucide-react';
-import CarModal from './CarModal';
+import { useEffect, useState } from 'react';
+import { Car, Search, Plus, Calendar, Palette, ListOrdered } from 'lucide-react';
 import { CarFormData } from '../types/Car';
 import { signOut } from '../auth/logout/action';
 import { getCarsInCollection } from './actions';
-import { set, success } from 'zod';
+import CarModal from './CarModal';
 
 
 export default function HotWheelsDashboard() {
@@ -20,9 +19,11 @@ export default function HotWheelsDashboard() {
     async function fetchCarsInCollection() {
       try {
         const carsInCollection = await getCarsInCollection()
+        if ('success' in carsInCollection) {
+          console.error("Erro ao carregar coleção:", carsInCollection.error);
+          return;
+        }
         setCarCollection(carsInCollection)
-      } catch (error) {
-        console.error("Erro ao carregar coleção:", error)
       } finally {
         setLoading(false)
       }
@@ -41,6 +42,13 @@ export default function HotWheelsDashboard() {
       // Se foi uma adição, adiciona o novo carrinho no topo ou fim da lista
       setCarCollection((prev) => [newData, ...prev]);
     }
+  }
+
+  const handleDeleteSuccess = (deletedId: string) => {
+    // Remove o carrinho deletado da coleção localmente para atualizar a UI
+    setCarCollection((prev) => prev.filter(car => car.id !== deletedId));
+    setIsModalOpen(false);
+    setSelectedCar(null);
   }
 
   return (
@@ -82,7 +90,17 @@ export default function HotWheelsDashboard() {
       </div>
 
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {carCollection
+        {loading ? (
+          <div className="col-span-full flex items-center justify-center py-20">
+            <Car size={128} className="text-slate-300 animate-pulse" />
+          </div>
+        ) : carCollection.length === 0 ? (
+          <div className="col-span-full flex flex-col items-center justify-center py-20 gap-4">
+            <Car size={128} className="text-slate-300" />
+            <p className="text-slate-500">Sua garagem está vazia. Adicione seu primeiro carrinho!</p>
+          </div>
+        ) : (
+        carCollection
           .filter(car => car.modelName.toLowerCase().includes(searchTerm.toLowerCase()) || car.modelCode.toLowerCase().includes(searchTerm.toLowerCase()))
           .map((car) => (
           <div key={car.id} className="bg-white rounded-3xl border-2 border-slate-100 shadow-xl overflow-hidden flex flex-col hover:border-orange-200 transition-all">
@@ -143,7 +161,7 @@ export default function HotWheelsDashboard() {
               </button>
             </div>
           </div>
-        ))}
+        )))}
       </div>
 
       {/* Modal de Adição de Carro */}
@@ -152,6 +170,7 @@ export default function HotWheelsDashboard() {
       initialData={selectedCar} 
       onClose={() => {setIsModalOpen(false); setSelectedCar(null);}}
       onSuccess={handleFormSuccess}
+      onDeleteSuccess={handleDeleteSuccess}
       />
     </div>
   );

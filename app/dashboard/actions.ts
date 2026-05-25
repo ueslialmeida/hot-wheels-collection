@@ -111,3 +111,19 @@ export async function updateCarInCollection(carData: CarFormData) {
     revalidatePath('/dashboard')
     return { success: true }
 }
+
+export async function deleteCarFromCollection(carId: string) {
+    const supabase = await getSupabaseServerClient()
+
+    const { error } = await supabase
+        .from('cars')
+        .delete()
+        .eq('id', carId)
+
+    if (error) {
+        return { success: false, error: "Não foi possível remover o carrinho da garagem." }
+    }
+
+    revalidatePath('/dashboard')
+    return { success: true }
+}
