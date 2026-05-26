@@ -9,7 +9,7 @@ import { addCarToCollection, updateCarInCollection, deleteCarFromCollection } fr
 interface CarModalProps {
   isOpen: boolean;
   onClose: () => void;
-  initialData?: CarFormData | null; // dados do carro selecionado
+  initialData?: CarFormData | null; // Selected car data
   onSuccess: (data: CarFormData, isEditing: boolean) => void;
   onDeleteSuccess: (id: string) => void;
 }
@@ -20,19 +20,19 @@ export default function CarModal({ isOpen, onClose, initialData, onSuccess, onDe
   
   const { register, handleSubmit, reset, formState: { errors } } = useForm<CarFormData>(
     {
-      shouldUnregister: true, // Desregistra campos não montados
+      shouldUnregister: true, // Unregister inputs when unmounted to prevent stale data
       defaultValues: initialData || {}
     }
   );
 
-  // Atualiza o form sempre que o initialData mudar
+  // Updates the form values whenever the modal opens or the initialData changes
   useEffect(() => {
     if (isOpen) {
       setIsConfirmingDelete(false);
       if (initialData) {
         reset(initialData);
       } else {
-        // Reseta para valores vazios ao adicionar novo
+        // Resets the form to empty values when opening for a new car
         reset({
           id: '',
           modelName: '',
@@ -66,8 +66,8 @@ export default function CarModal({ isOpen, onClose, initialData, onSuccess, onDe
       }
     }
     
-    reset(); // Limpa o formulário
-    onClose(); // Fecha o modal
+    reset(); // Clear the form
+    onClose(); // Closes the modal
   };
 
   const handleDelete = async () => {
@@ -100,10 +100,10 @@ export default function CarModal({ isOpen, onClose, initialData, onSuccess, onDe
           </button>
         </div>
 
-        {/* Formulário / Tela de Confirmação */}
+        {/* Car form / Delete confirmation screen */}
         <div className="p-8">
           {isConfirmingDelete ? (
-            /* Sub-tela de Confirmação de Deleção */
+            /* Delete confirmation screen */
             <div className="py-6 text-center space-y-4 animate-in fade-in zoom-in-95 duration-150">
               <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto shadow-sm">
                 <TriangleAlert size={32} />
@@ -115,7 +115,7 @@ export default function CarModal({ isOpen, onClose, initialData, onSuccess, onDe
                 </p>
               </div>
 
-              {/* Botões de Confirmação de Exclusão */}
+              {/* Delete confirmation buttons */}
               <div className="pt-6 flex gap-4 max-w-md mx-auto">
                 <button 
                   type="button"
@@ -134,7 +134,7 @@ export default function CarModal({ isOpen, onClose, initialData, onSuccess, onDe
               </div>
             </div>
           ) : (
-            /* Formulário Tradicional */
+            /* Car form */
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* ID do Registro */}
@@ -146,16 +146,16 @@ export default function CarModal({ isOpen, onClose, initialData, onSuccess, onDe
                   </div>
                 </div>
                 
-                {/* Nome do Modelo */}
+                {/* Model name field */}
                 <div className="md:col-span-2">
-                  <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Nome do Modelo</label>
+                  <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Nome do Modelo <span className="text-red-500">*</span></label>
                   <div className="relative">
                     <Tag className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                     <input id="model-name" {...register('modelName', { required: true })} className="w-full pl-10 pr-4 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-orange-500 outline-none transition-all" placeholder="Ex: Nissan Skyline GT-R (R34)" />
                   </div>
                 </div>
 
-                {/* Código do Modelo */}
+                {/* Model code field */}
                 <div>
                   <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Código do Modelo</label>
                   <div className="relative">
@@ -164,7 +164,7 @@ export default function CarModal({ isOpen, onClose, initialData, onSuccess, onDe
                   </div>
                 </div>
 
-                {/* Ano */}
+                {/* Publication year field */}
                 <div>
                   <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Ano de Lançamento</label>
                   <div className="relative">
@@ -173,7 +173,7 @@ export default function CarModal({ isOpen, onClose, initialData, onSuccess, onDe
                   </div>
                 </div>
 
-                {/* Série */}
+                {/* Series field */}
                 <div>
                   <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Série / Coleção</label>
                   <div className="relative">
@@ -182,7 +182,7 @@ export default function CarModal({ isOpen, onClose, initialData, onSuccess, onDe
                   </div>
                 </div>
 
-                {/* Cor */}
+                {/* Color field */}
                 <div>
                   <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Cor Predominante</label>
                   <div className="relative">
@@ -191,7 +191,7 @@ export default function CarModal({ isOpen, onClose, initialData, onSuccess, onDe
                   </div>
                 </div>
 
-                {/* Número na Coleção Anual */}
+                {/* Number in Year Collection field */}
                 <div>
                   <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Número Anual</label>
                   <div className="relative">
@@ -200,7 +200,7 @@ export default function CarModal({ isOpen, onClose, initialData, onSuccess, onDe
                   </div>
                 </div>
 
-                {/* Número na Série */}
+                {/* NNumber in Series field */}
                 <div>
                   <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Número na Série</label>
                   <div className="relative">
@@ -209,7 +209,7 @@ export default function CarModal({ isOpen, onClose, initialData, onSuccess, onDe
                   </div>
                 </div>
 
-                {/* URL da Imagem */}
+                {/* Car image URL field */}
                 <div className="md:col-span-2">
                   <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">URL da Imagem</label>
                   <div className="relative">
@@ -219,13 +219,13 @@ export default function CarModal({ isOpen, onClose, initialData, onSuccess, onDe
                 </div>
               </div>
 
-              {/* Footer / Botões Tradicionais */}
+              {/* Footer / common buttons */}
               <div className="pt-6 flex gap-4 items-center">
                 {isEditing && (
                   <button 
                     id="delete"
                     type="button"
-                    onClick={() => setIsConfirmingDelete(true)} // Apenas ativa o modo de confirmação
+                    onClick={() => setIsConfirmingDelete(true)} // Activates the delete confirmation screen
                     className="text-red-500 font-bold hover:text-red-600 transition-colors p-2 rounded-xl hover:bg-red-50"
                   >
                     <Trash2 size={30} />

@@ -1,7 +1,7 @@
 'use client'
 
-import React, { useActionState } from 'react';
-import { Lock, Mail, ArrowRight } from 'lucide-react';
+import { useActionState } from 'react';
+import { Mail, ArrowRight } from 'lucide-react';
 import {resetPassword} from './actions';
 
 export default function ResetPasswordPage() {
@@ -38,7 +38,7 @@ export default function ResetPasswordPage() {
           <div className="space-y-4">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-slate-700">
-                E-mail
+                E-mail <span className="text-red-500">*</span>
               </label>
               <div className="mt-1 relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">

@@ -110,7 +110,7 @@ export default function HotWheelsDashboard() {
               <span className="text-orange-500 font-black text-sm italic">{car.numberInYearCollection}</span>
             </div>
 
-            {/* Area da "Foto" */}
+            {/* Car picture */}
             <div className="h-44 bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center relative group">
               {car.imageUrl ? (
                 <img src={car.imageUrl} alt={car.modelName} className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500" />
@@ -122,7 +122,7 @@ export default function HotWheelsDashboard() {
               </div>
             </div>
 
-            {/* Informações */}
+            {/* Car data */}
             <div className="p-6 flex-1 flex flex-col">
               <div className="mb-4">
                 <h2 className="text-xl font-bold text-slate-800 leading-tight mb-1">{car.modelName}</h2>
@@ -151,7 +151,7 @@ export default function HotWheelsDashboard() {
               </div>
             </div>
 
-            {/* Footer do Card */}
+            {/* Card footer */}
             <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end">
               <button onClick={() => {
                 setSelectedCar(car);
@@ -164,7 +164,7 @@ export default function HotWheelsDashboard() {
         )))}
       </div>
 
-      {/* Modal de Adição de Carro */}
+      {/* Car add/edit modal component */}
       <CarModal 
       isOpen={isModalOpen} 
       initialData={selectedCar} 
