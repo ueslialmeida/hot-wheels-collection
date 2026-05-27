@@ -1,55 +1,57 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Car, Search, Plus, Calendar, Palette, ListOrdered } from 'lucide-react';
+import { Car, Search, Plus, Calendar, Palette, ListOrdered, Frown } from 'lucide-react'; // Adicionei o ícone Frown para a busca vazia
 import { CarFormData } from '../types/Car';
 import { signOut } from '../auth/logout/action';
 import { getCarsInCollection } from './actions';
 import CarModal from './CarModal';
-
 
 export default function HotWheelsDashboard() {
   const [searchTerm, setSearchTerm] = useState('');
   const [carCollection, setCarCollection] = useState<CarFormData[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCar, setSelectedCar] = useState<CarFormData | null>(null);
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchCarsInCollection() {
       try {
-        const carsInCollection = await getCarsInCollection()
+        const carsInCollection = await getCarsInCollection();
         if ('success' in carsInCollection) {
           console.error("Erro ao carregar coleção:", carsInCollection.error);
           return;
         }
-        setCarCollection(carsInCollection)
+        setCarCollection(carsInCollection);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     }
 
-    fetchCarsInCollection()
-  }, [])
+    fetchCarsInCollection();
+  }, []);
+
+  // Deriving the list of cars from car collection and search term, to avoid filtering on every render
+  const filteredCars = carCollection.filter((car) =>
+    car.modelName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    car.modelCode.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const handleFormSuccess = (newData: CarFormData, isEditing: boolean) => {
     if (isEditing) {
-      // Se foi uma edição, mapeia a lista substituindo o carrinho antigo pelo atualizado
-      setCarCollection((prev) => 
+      setCarCollection((prev) =>
         prev.map((car) => car.id === newData.id ? newData : car)
       );
     } else {
-      // Se foi uma adição, adiciona o novo carrinho no topo ou fim da lista
       setCarCollection((prev) => [newData, ...prev]);
     }
-  }
+  };
 
   const handleDeleteSuccess = (deletedId: string) => {
-    // Remove o carrinho deletado da coleção localmente para atualizar a UI
     setCarCollection((prev) => prev.filter(car => car.id !== deletedId));
     setIsModalOpen(false);
     setSelectedCar(null);
-  }
+  };
 
   return (
     <div className="min-h-screen bg-slate-50 p-4 md:p-10 text-slate-900">
@@ -99,78 +101,86 @@ export default function HotWheelsDashboard() {
             <Car size={128} className="text-slate-300" />
             <p className="text-slate-500">Sua garagem está vazia. Adicione seu primeiro carrinho!</p>
           </div>
-        ) : (
-        carCollection
-          .filter(car => car.modelName.toLowerCase().includes(searchTerm.toLowerCase()) || car.modelCode.toLowerCase().includes(searchTerm.toLowerCase()))
-          .map((car) => (
-          <div key={car.id} className="bg-white rounded-3xl border-2 border-slate-100 shadow-xl overflow-hidden flex flex-col hover:border-orange-200 transition-all">
-            {/* Top Bar - Representando a embalagem */}
-            <div className="bg-slate-900 p-4 flex justify-between items-center z-10">
-              <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Código: {car.modelCode}</span>
-              <span className="text-orange-500 font-black text-sm italic">{car.numberInYearCollection}</span>
-            </div>
-
-            {/* Car picture */}
-            <div className="h-44 bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center relative group">
-              {car.imageUrl ? (
-                <img src={car.imageUrl} alt={car.modelName} className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500" />
-              ) : (
-                <Car size={80} className="text-slate-300 group-hover:text-orange-400 group-hover:scale-110 transition-all duration-500" />
-              )}
-              <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold shadow-sm">
-                SERIE: {car.serie.toUpperCase()}
-              </div>
-            </div>
-
-            {/* Car data */}
-            <div className="p-6 flex-1 flex flex-col">
-              <div className="mb-4">
-                <h2 className="text-xl font-bold text-slate-800 leading-tight mb-1">{car.modelName}</h2>
-                <div className="flex items-center gap-2 text-slate-400">
-                  <Palette size={14} />
-                  <span className="text-xs font-medium uppercase tracking-wider">{car.color}</span>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4 mt-auto">
-                <div className="bg-slate-100 p-3 rounded-2xl border border-slate-200">
-                  <div className="flex items-center gap-2 text-slate-500 mb-1">
-                    <Calendar size={14} />
-                    <span className="text-[10px] font-bold uppercase">Ano</span>
-                  </div>
-                  <span className="text-sm font-bold text-slate-700">{car.collectionYear}</span>
-                </div>
-
-                <div className="bg-slate-100 p-3 rounded-2xl border border-slate-200">
-                  <div className="flex items-center gap-2 text-slate-500 mb-1">
-                    <ListOrdered size={14} />
-                    <span className="text-[10px] font-bold uppercase">Na Série</span>
-                  </div>
-                  <span className="text-sm font-bold text-slate-700">{car.numberInSerie}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Card footer */}
-            <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end">
-              <button onClick={() => {
-                setSelectedCar(car);
-                setIsModalOpen(true);}} 
-                className="text-xs font-bold text-slate-600 hover:text-orange-600 transition-colors uppercase">
-                Editar Registro
-              </button>
-            </div>
+        ) : filteredCars.length === 0 ? (
+          // If the search term is not empty and there are no cars matching the search, show a message
+          <div className="col-span-full flex flex-col items-center justify-center py-20 gap-4">
+            <Frown size={128} className="text-slate-300" />
+            <p className="text-slate-500 text-center">
+              Nenhum carrinho encontrado para "<span className="font-semibold text-slate-700">{searchTerm}</span>".
+            </p>
           </div>
-        )))}
+        ) : (
+          // Map through the filtered list of cars instead of the entire collection
+          filteredCars.map((car) => (
+            <div key={car.id} className="bg-white rounded-3xl border-2 border-slate-100 shadow-xl overflow-hidden flex flex-col hover:border-orange-200 transition-all">
+              {/* Top Bar */}
+              <div className="bg-slate-900 p-4 flex justify-between items-center z-10">
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Código: {car.modelCode}</span>
+                <span className="text-orange-500 font-black text-sm italic">{car.numberInYearCollection}</span>
+              </div>
+
+              {/* Car picture */}
+              <div className="h-44 bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center relative group">
+                {car.imageUrl ? (
+                  <img src={car.imageUrl} alt={car.modelName} className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                ) : (
+                  <Car size={80} className="text-slate-300 group-hover:text-orange-400 group-hover:scale-110 transition-all duration-500" />
+                )}
+                <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold shadow-sm">
+                  SERIE: {car.serie.toUpperCase()}
+                </div>
+              </div>
+
+              {/* Car data */}
+              <div className="p-6 flex-1 flex flex-col">
+                <div className="mb-4">
+                  <h2 className="text-xl font-bold text-slate-800 leading-tight mb-1">{car.modelName}</h2>
+                  <div className="flex items-center gap-2 text-slate-400">
+                    <Palette size={14} />
+                    <span className="text-xs font-medium uppercase tracking-wider">{car.color}</span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 mt-auto">
+                  <div className="bg-slate-100 p-3 rounded-2xl border border-slate-200">
+                    <div className="flex items-center gap-2 text-slate-500 mb-1">
+                      <Calendar size={14} />
+                      <span className="text-[10px] font-bold uppercase">Ano</span>
+                    </div>
+                    <span className="text-sm font-bold text-slate-700">{car.collectionYear}</span>
+                  </div>
+
+                  <div className="bg-slate-100 p-3 rounded-2xl border border-slate-200">
+                    <div className="flex items-center gap-2 text-slate-500 mb-1">
+                      <ListOrdered size={14} />
+                      <span className="text-[10px] font-bold uppercase">Na Série</span>
+                    </div>
+                    <span className="text-sm font-bold text-slate-700">{car.numberInSerie}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Card footer */}
+              <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end">
+                <button onClick={() => {
+                  setSelectedCar(car);
+                  setIsModalOpen(true);}} 
+                  className="text-xs font-bold text-slate-600 hover:text-orange-600 transition-colors uppercase">
+                  Editar Registro
+                </button>
+              </div>
+            </div>
+          ))
+        )}
       </div>
 
       {/* Car add/edit modal component */}
       <CarModal 
-      isOpen={isModalOpen} 
-      initialData={selectedCar} 
-      onClose={() => {setIsModalOpen(false); setSelectedCar(null);}}
-      onSuccess={handleFormSuccess}
-      onDeleteSuccess={handleDeleteSuccess}
+        isOpen={isModalOpen} 
+        initialData={selectedCar} 
+        onClose={() => {setIsModalOpen(false); setSelectedCar(null);}}
+        onSuccess={handleFormSuccess}
+        onDeleteSuccess={handleDeleteSuccess}
       />
     </div>
   );
