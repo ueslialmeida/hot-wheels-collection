@@ -58,7 +58,7 @@ export default function ResetPasswordPage() {
 
           <div>
             <button
-            id='login'
+            id='reset-password-button'
               formAction={formAction}
               type="submit"
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-semibold rounded-lg text-white bg-slate-900 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"

@@ -119,7 +119,7 @@ export default function RegisterPage() {
           </div>
 
           <button
-          id='register'
+          id='register-button'
             formAction={formAction}
             type="submit"
             disabled={isSubmitting}

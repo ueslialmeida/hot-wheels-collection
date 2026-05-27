@@ -29,6 +29,6 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts"
-  ],
+, "tests/cypress/e2e/auth.cy.js", "tests/cypress/support/commands.js", "tests/cypress/support/e2e.js", "cypress.config.js"  ],
   "exclude": ["node_modules"]
 }
