@@ -36,6 +36,11 @@ Este documento contém os casos de teste funcionais para a aplicação de coleci
     **Quando** tentar enviar o formulário
     **Então** não deve criar uma conta.
 
+**Cenário: Falha no cadastro por usuário duplicado**
+    **Dado que** um usuário anônimo preenche o formulário de cadastro, mas fornece um e-mail que já existe.
+    **Quando** tentar enviar o formulário
+    **Então** não deve criar uma conta.
+
 #### /auth/login
 **Cenário: Layout da página de login**
     **Dado que** um usuário anônimo acessa a página de login `/auth/login`

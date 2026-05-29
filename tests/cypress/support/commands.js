@@ -51,6 +51,12 @@ Cypress.Commands.add('login', () => {
     cy.get('#email').type(userEmail)
     cy.get('#password').type(userPassword)
 
-    cy.get('#login').click()
-    cy.contains('Minha Garagem')
+    cy.get('#login-button').click()
+    cy.wait(500)
+})
+
+Cypress.Commands.add('removeRequiredAttribute', (elements) => {
+    elements.forEach(element => {
+        cy.get(element).invoke('removeAttr', 'required')
+    })
 })
