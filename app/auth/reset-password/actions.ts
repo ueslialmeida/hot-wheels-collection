@@ -11,7 +11,14 @@ export type ActionState = {
 export async function resetPassword(prevState: ActionState | undefined, formData: FormData): Promise<ActionState> {
     const supabase = await getSupabaseServerClient()
 
-    // TODO: validate inputs
+    // Validate inputs
+    if (!formData.get('email')) {
+        return { 
+            success: false, 
+            message: 'Por favor, preencha o campo de e-mail.' 
+        }
+    }
+
     const data = {
         email: formData.get('email') as string,
     }

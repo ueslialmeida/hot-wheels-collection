@@ -14,6 +14,14 @@ export async function addCarToCollection(carData: CarFormData) {
         return { success: false, error: authError?.message }
     }
 
+    if (!carData.modelName) {
+        return { success: false, error: "O nome do modelo é obrigatório." }
+    }
+
+    if ((isNaN(carData.collectionYear) || carData.collectionYear < 1900 || carData.collectionYear > new Date().getFullYear())) {
+        return { success: false, error: "O ano da coleção é inválido." }
+    }
+
     const car = {
         model_name: carData.modelName as string,
         model_code: carData.modelCode as string,
@@ -88,6 +96,14 @@ export async function updateCarInCollection(carData: CarFormData) {
 
     if (!carData.id) {
         return { success: false, error: "ID do carrinho é necessário para atualização." }
+    }
+
+    if (!carData.modelName) {
+        return { success: false, error: "O nome do modelo é obrigatório." }
+    }
+
+    if ((isNaN(carData.collectionYear) || carData.collectionYear < 1900 || carData.collectionYear > new Date().getFullYear())) {
+        return { success: false, error: "O ano da coleção é inválido." }
     }
 
     const { error } = await supabase

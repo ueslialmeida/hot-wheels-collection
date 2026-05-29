@@ -17,6 +17,7 @@ interface CarModalProps {
 export default function CarModal({ isOpen, onClose, initialData, onSuccess, onDeleteSuccess }: CarModalProps) {
   const isEditing = !!initialData;
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
   
   const { register, handleSubmit, reset, formState: { errors } } = useForm<CarFormData>(
     {
@@ -29,6 +30,7 @@ export default function CarModal({ isOpen, onClose, initialData, onSuccess, onDe
   useEffect(() => {
     if (isOpen) {
       setIsConfirmingDelete(false);
+      setServerError(null); // Clears previous server errors on new submission attempt
       if (initialData) {
         reset(initialData);
       } else {
@@ -51,18 +53,29 @@ export default function CarModal({ isOpen, onClose, initialData, onSuccess, onDe
   if (!isOpen) return null;
 
   const onSubmit = async (data: CarFormData) => {
+    setServerError(null); // Clears previous server errors on new submission attempt
+
     if (isEditing) {
-      await updateCarInCollection(data)
+      const updatedCar = await updateCarInCollection(data);
+      
+      // Data validation from backend when editing
+      if (updatedCar && 'success' in updatedCar && !updatedCar.success) {
+        setServerError(updatedCar.error || "Erro ao atualizar o carrinho.");
+        return;
+      }
+      
       onSuccess(data, isEditing);
     } else {
-      const savedCar = await addCarToCollection(data)
-      if ('success' in savedCar) {
+      const savedCar = await addCarToCollection(data);
+      
+      // Data validation from backend when adding a new car
+      if (savedCar && 'success' in savedCar) {
         if (!savedCar.success) {
-          console.error("Erro ao salvar o carrinho:", savedCar.error);
+          setServerError(savedCar.error || "Erro ao salvar o carrinho.");
           return;
         }
       } else {
-        onSuccess(savedCar, isEditing);
+        onSuccess(savedCar as CarFormData, isEditing);
       }
     }
     
@@ -72,12 +85,12 @@ export default function CarModal({ isOpen, onClose, initialData, onSuccess, onDe
 
   const handleDelete = async () => {
     if (initialData?.id) {
-      await deleteCarFromCollection(initialData.id)
+      await deleteCarFromCollection(initialData.id);
       onDeleteSuccess(initialData.id);
       reset();
       onClose();
     }
-  }
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
@@ -136,8 +149,17 @@ export default function CarModal({ isOpen, onClose, initialData, onSuccess, onDe
           ) : (
             /* Car form */
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              
+              {/* Server side error validation message */}
+              {serverError && (
+                <div className="flex items-center gap-3 bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl animate-in fade-in slide-in-from-top-2 duration-200">
+                  <TriangleAlert size={20} className="shrink-0" />
+                  <p className="text-sm font-medium">{serverError}</p>
+                </div>
+              )}
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* ID do Registro */}
+                {/* Register ID */}
                 <div className="hidden md:col-span-2">
                   <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">ID do Registro</label>
                   <div className="relative">
@@ -153,6 +175,7 @@ export default function CarModal({ isOpen, onClose, initialData, onSuccess, onDe
                     <Tag className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                     <input id="model-name" {...register('modelName', { required: true })} className="w-full pl-10 pr-4 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-orange-500 outline-none transition-all" placeholder="Ex: Nissan Skyline GT-R (R34)" />
                   </div>
+                  {errors.modelName && <span className="text-xs text-red-500 mt-1 ml-1 block">Este campo é obrigatório.</span>}
                 </div>
 
                 {/* Model code field */}
@@ -200,7 +223,7 @@ export default function CarModal({ isOpen, onClose, initialData, onSuccess, onDe
                   </div>
                 </div>
 
-                {/* NNumber in Series field */}
+                {/* Number in Series field */}
                 <div>
                   <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Número na Série</label>
                   <div className="relative">
