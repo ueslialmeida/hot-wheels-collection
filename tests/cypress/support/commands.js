@@ -48,8 +48,8 @@ Cypress.Commands.add('login', () => {
     
     cy.visit(loginUrl)
 
-    cy.get('#email').type(userEmail)
-    cy.get('#password').type(userPassword)
+    cy.get('#email').type(userEmail, {log: false})
+    cy.get('#password').type(userPassword, {log: false})
 
     cy.get('#login-button').click()
     cy.wait(500)
