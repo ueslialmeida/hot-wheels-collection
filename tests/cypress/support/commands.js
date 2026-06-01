@@ -48,8 +48,8 @@ Cypress.Commands.add('login', () => {
     
     cy.visit(loginUrl)
 
-    cy.get('#email').type(userEmail)
-    cy.get('#password').type(userPassword)
+    cy.get('#email').type(userEmail, {log: false})
+    cy.get('#password').type(userPassword, {log: false})
 
     cy.get('#login-button').click()
     cy.wait(500)
@@ -59,4 +59,27 @@ Cypress.Commands.add('removeRequiredAttribute', (elements) => {
     elements.forEach(element => {
         cy.get(element).invoke('removeAttr', 'required')
     })
+})
+
+Cypress.Commands.add('addNewCar', (car) => {
+    cy.get('#add-new-car').click()
+    cy.get('#model-name').type(car.model)
+    cy.get('#model-code').type(car.modelCode)
+    cy.get('#collection-year').type(car.year)
+    cy.get('#serie').type(car.series)
+    cy.get('#color').type(car.color)
+    cy.get('#number-in-year-collection').type(car.numInCollection)
+    cy.get('#number-in-serie').type(car.numInSeries)
+    car.imageUrl && cy.get('#image-url').type(car.imageUrl, {delay: 0})
+    cy.get('#save').click()
+})
+
+Cypress.Commands.add('deleteCarFromCollection', () => {
+    cy.visit(`${Cypress.expose('baseUrl')}/dashboard`)
+    cy.get('#car-list').find('button').contains('Editar Registro').click()
+    cy.wait(500)
+    cy.get('#delete').click()
+    cy.wait(500)
+    cy.get('#confirm-delete').click()
+    cy.wait(500)
 })
