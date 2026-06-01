@@ -131,6 +131,7 @@ export default function CarModal({ isOpen, onClose, initialData, onSuccess, onDe
               {/* Delete confirmation buttons */}
               <div className="pt-6 flex gap-4 max-w-md mx-auto">
                 <button 
+                  id="cancel-delete"
                   type="button"
                   onClick={() => setIsConfirmingDelete(false)}
                   className="flex-1 py-3 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition-colors uppercase text-xs tracking-wider"
@@ -138,6 +139,7 @@ export default function CarModal({ isOpen, onClose, initialData, onSuccess, onDe
                   Não, voltar
                 </button>
                 <button 
+                  id="confirm-delete"
                   type="button"
                   onClick={handleDelete}
                   className="flex-1 py-3 bg-red-500 text-white font-bold rounded-xl hover:bg-red-600 transition-colors shadow-lg shadow-red-200 uppercase text-xs tracking-wider"

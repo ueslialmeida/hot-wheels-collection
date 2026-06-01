@@ -66,13 +66,14 @@ export default function HotWheelsDashboard() {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
             <input 
+            id="search"
               type="text" 
               placeholder="Buscar por modelo ou código..." 
               className="pl-10 pr-4 py-3 bg-white border-2 border-slate-200 rounded-xl focus:border-orange-500 outline-none transition-all w-full md:w-80 shadow-sm"
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <button onClick={() => {setSelectedCar(null); setIsModalOpen(true);}} className="bg-slate-900 text-white px-6 py-3 rounded-xl font-bold hover:bg-orange-600 transition-colors flex items-center gap-2 shadow-lg">
+          <button id="add-new-car" onClick={() => {setSelectedCar(null); setIsModalOpen(true);}} className="bg-slate-900 text-white px-6 py-3 rounded-xl font-bold hover:bg-orange-600 transition-colors flex items-center gap-2 shadow-lg">
             <Plus size={20} /> Adicionar
           </button>
         </div>
@@ -82,7 +83,7 @@ export default function HotWheelsDashboard() {
         <div>
           <h2 className="text-2xl font-black text-slate-900 tracking-tighter uppercase">
             Minha Garagem | 
-            <button onClick={signOut} 
+            <button id="sign-out" onClick={signOut} 
                 className="text-xl ml-2 mb-2 font-bold text-slate-700 hover:text-orange-600 transition-colors uppercase">
                 Sair da Garagem
               </button>
@@ -91,7 +92,7 @@ export default function HotWheelsDashboard() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div id="car-list" className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {loading ? (
           <div className="col-span-full flex items-center justify-center py-20">
             <Car size={128} className="text-slate-300 animate-pulse" />

@@ -36,6 +36,11 @@ This document contains the functional test cases for the Hot Wheels Collector ap
     **When** they attempt to submit the form
     **Then** it should not create an account.
 
+**Scenario: Registration failed due to duplicated user**
+    **Given** an anonymous user fills in the registration form but provides an email that already exists
+    **When** they attempt to submit the form
+    **Then** it should not create an account.
+
 #### /auth/login
 **Scenario: Layout of the login page**
     **Given** an anonymous user accesses the login page `/auth/login`
