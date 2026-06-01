@@ -11,7 +11,21 @@ export type ActionState = {
 export async function updatePassword(prevState: ActionState | undefined, formData: FormData): Promise<ActionState> {
     const supabase = await getSupabaseServerClient()
 
-    // TODO: validate inputs
+    // Validate inputs
+    if (!formData.get('password')) {
+        return { 
+            success: false, 
+            message: 'Por favor, preencha o campo de senha.' 
+        }
+    }
+
+    if ((formData.get('password') as string).length < 8) {
+        return { 
+            success: false, 
+            message: 'A senha deve ter pelo menos 8 caracteres.' 
+        }
+    }
+
     const data = {
         password: formData.get('password') as string,
     }

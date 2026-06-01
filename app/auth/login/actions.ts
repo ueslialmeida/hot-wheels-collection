@@ -7,7 +7,11 @@ import { getSupabaseServerClient } from "@/lib/supabase/server-client"
 export async function login(prevState: {error: string | null}, formData: FormData) {
     const supabase = await getSupabaseServerClient()
 
-    // TODO: validate inputs
+    // Validate inputs
+    if (!formData.get('email') || !formData.get('password')) {
+        return {error: 'Por favor, preencha todos os campos.'}
+    }
+
     const data = {
         email: formData.get('email') as string,
         password: formData.get('password') as string,

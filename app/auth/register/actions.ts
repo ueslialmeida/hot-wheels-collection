@@ -11,7 +11,21 @@ export type ActionState = {
 export async function signup(prevState: ActionState | undefined, formData: FormData): Promise<ActionState> {
   const supabase = await getSupabaseServerClient()
 
-  // TODO: validate inputs
+  // Validate inputs
+  if (!formData.get('email') || !formData.get('password') || !formData.get('name')) {
+    return { 
+      success: false, 
+      message: 'Por favor, preencha todos os campos.' 
+    }
+  }
+
+  if ((formData.get('password') as string).length < 8) {
+    return { 
+      success: false, 
+      message: 'A senha deve ter pelo menos 8 caracteres.' 
+    }
+  }
+
   const data = {
     email: formData.get('email') as string,
     password: formData.get('password') as string,
@@ -37,6 +51,11 @@ export async function signup(prevState: ActionState | undefined, formData: FormD
           message: 'Por favor, insira um e-mail válido.'
         }
       case 'email_exists':
+        return { 
+          success: false, 
+          message: 'Este e-mail já está em uso.'
+        }
+      case 'user_already_exists':
         return { 
           success: false, 
           message: 'Este e-mail já está em uso.'
