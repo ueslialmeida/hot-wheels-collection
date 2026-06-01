@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test:cypress:local": "cypress run",
+    "test:cypress:local": "cypress open",
     "test:cypress:ci": "start-server-and-test dev http://localhost:3000 'cypress run'"
   },
   "dependencies": {
@@ -25,7 +25,8 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "cypress": "^15.15.0",
+    "cypress": "^15.16.0",
+    "dotenv": "^17.4.2",
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
     "start-server-and-test": "^3.0.5",

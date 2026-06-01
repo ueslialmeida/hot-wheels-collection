@@ -35,3 +35,22 @@
 //     }
 //   }
 // }
+
+Cypress.Commands.add('login', () => {
+    const baseUrl = Cypress.expose('baseUrl')
+    const loginUrl = `${baseUrl}/auth/login`
+    const userEmail = Cypress.expose('userEmail')
+    const userPassword = Cypress.expose('userPassword')
+
+    if (!userEmail || !userPassword) {
+        throw new Error('TEST_USER_EMAIL and TEST_USER_PASSWORD must be set in environment variables')
+    }
+    
+    cy.visit(loginUrl)
+
+    cy.get('#email').type(userEmail)
+    cy.get('#password').type(userPassword)
+
+    cy.get('#login').click()
+    cy.contains('Minha Garagem')
+})
