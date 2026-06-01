@@ -4,9 +4,9 @@ This document contains the functional test cases for the Hot Wheels Collector ap
 
 ---
 
-### # Auth
+## # Auth
 
-#### /auth/register
+### /auth/register
 **Scenario: Layout of the registration page**  
     **Given** an anonymous user accesses the registration page `/auth/register`  
     **Then** it should display a registration form with Name, Email, and Password fields, a registration button, and a message containing a login page link.
@@ -41,7 +41,7 @@ This document contains the functional test cases for the Hot Wheels Collector ap
     **When** they attempt to submit the form  
     **Then** it should not create an account.
 
-#### /auth/login
+### /auth/login
 **Scenario: Layout of the login page**  
     **Given** an anonymous user accesses the login page `/auth/login`  
     **Then** it should display a login form with Email and Password fields, a login button, a password recovery link, and a message containing a Registration page link.
@@ -71,7 +71,7 @@ This document contains the functional test cases for the Hot Wheels Collector ap
     **When** they click the login button  
     **Then** it should not log the user in.
 
-#### /auth/reset-password
+### /auth/reset-password
 **Scenario: Layout of the reset password page**  
     **Given** an anonymous user accesses the password reset page `/auth/reset-password`  
     **Then** it should display an Email field and a submit button.
@@ -91,7 +91,7 @@ This document contains the functional test cases for the Hot Wheels Collector ap
     **When** they click the submit button  
     **Then** it should not send a reset password email.
 
-#### /auth/update-password
+### /auth/update-password
 **Scenario: Layout of the update password page**  
     **Given** a user accesses the password update page `/auth/update-password`  
     **Then** it should display a Password field and a submit button.
@@ -123,9 +123,9 @@ This document contains the functional test cases for the Hot Wheels Collector ap
 
 ---
 
-### # Dashboard
+## # Dashboard
 
-#### /dashboard
+### /dashboard
 **Scenario: Layout of the main dashboard elements**  
     **Given** an authenticated user is on `/dashboard`  
     **Then** it should display the collection counter  
@@ -219,7 +219,7 @@ This document contains the functional test cases for the Hot Wheels Collector ap
 
 ---
 
-### # General (Routes & Redirects)
+## # General (Routes & Redirects)
 
 **Scenario: Redirect authenticated user from login page**  
     **Given** a user is already logged into the application  
