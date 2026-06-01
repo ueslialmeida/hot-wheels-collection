@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useActionState } from 'react';
+import { useActionState } from 'react';
 import { User, Mail, Lock, ArrowRight, Sparkles } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -8,7 +8,7 @@ import * as z from 'zod';
 import Link from 'next/link';
 import { signup } from './actions';
 
-// Schema de validação com Zod
+// Schema validation with Zod
 const registerSchema = z.object({
   name: z.string().min(2, 'O nome deve ter pelo menos 2 caracteres'),
   email: z.email('Insira um e-mail válido'),
@@ -57,9 +57,9 @@ export default function RegisterPage() {
 
         <form className="mt-8 space-y-5" >
           <div className="space-y-4">
-            {/* Campo Nome */}
+            {/* Name field */}
             <div>
-              <label className="block text-sm font-medium text-slate-700">Nome Completo</label>
+              <label className="block text-sm font-medium text-slate-700">Nome Completo <span className="text-red-500">*</span></label>
               <div className="mt-1 relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <User className="h-5 w-5 text-slate-400" />
@@ -77,9 +77,9 @@ export default function RegisterPage() {
               {errors.name && <p className="mt-1 text-xs text-red-500 font-medium">{errors.name.message}</p>}
             </div>
 
-            {/* Campo Email */}
+            {/* Email field */}
             <div>
-              <label className="block text-sm font-medium text-slate-700">E-mail</label>
+              <label className="block text-sm font-medium text-slate-700">E-mail <span className="text-red-500">*</span></label>
               <div className="mt-1 relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Mail className="h-5 w-5 text-slate-400" />
@@ -97,9 +97,9 @@ export default function RegisterPage() {
               {errors.email && <p className="mt-1 text-xs text-red-500 font-medium">{errors.email.message}</p>}
             </div>
 
-            {/* Campo Senha */}
+            {/* Password field */}
             <div>
-              <label className="block text-sm font-medium text-slate-700">Senha</label>
+              <label className="block text-sm font-medium text-slate-700">Senha <span className="text-red-500">*</span></label>
               <div className="mt-1 relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Lock className="h-5 w-5 text-slate-400" />

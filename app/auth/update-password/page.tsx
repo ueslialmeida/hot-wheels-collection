@@ -40,7 +40,7 @@ export default function UpdatePasswordPage() {
             <div>
               <div>
                 <label htmlFor="password" className="block text-sm font-medium text-slate-700">
-                    Nova Senha
+                    Nova Senha <span className="text-red-500">*</span>
                 </label>
                 <div className="mt-1 relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
