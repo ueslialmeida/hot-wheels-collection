@@ -2,7 +2,7 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches-ignore: ["docs/**"]
+    branches: ["main"]
   pull_request:
     branches: ["main"]
 
@@ -66,6 +66,8 @@ jobs:
     env:
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL_PROD }}
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY_PROD }}
 
     steps:
       - name: Checkout código
