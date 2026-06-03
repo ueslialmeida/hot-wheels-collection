@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Car, Search, Plus, Calendar, Palette, ListOrdered, Frown } from 'lucide-react'; // Adicionei o ícone Frown para a busca vazia
+import { Car, Search, Plus, Calendar, Palette, ListOrdered, Frown } from 'lucide-react';
 import { CarFormData } from '../types/Car';
 import { signOut } from '../auth/logout/action';
 import { getCarsInCollection } from './actions';
