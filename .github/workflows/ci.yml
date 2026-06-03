@@ -9,10 +9,10 @@ on:
 jobs:
   # --- JOB 1: RUN AUTOMATED TESTS LOCALLY ---
   test:
-    # Skip if the PR is only for documentation changes
-    if: "!startsWith(github.head_ref, 'docs/')"
-
     runs-on: ubuntu-latest
+
+    # Ignores documentation changes to avoid unnecessary test runs, but runs on all other pushes and PRs
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && !startsWith(github.head_ref, 'docs/'))
     
     env:
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
@@ -56,16 +56,29 @@ jobs:
             test/videos
 
   # --- JOB 2: DEPLOY TO PRODUCTION ---
-  # deploy:
-  #   runs-on: ubuntu-latest
-  #   needs: test # If tests fail, this job will be skipped
+  deploy:
+    runs-on: ubuntu-latest
+    needs: test # Don't deploy if tests fail
     
-  #   # Only deploy when pushing to main branch
-  #   if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # Only deploys main branch
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     
-  #   steps:
-  #     - name: Checkout código
-  #       uses: actions/checkout@v4
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
-  #     - name: Deploy para Vercel (ou seu serviço de hosting)
-  #       run: npx vercel --token ${{ secrets.VERCEL_TOKEN }} --prod --yes
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      # Pulls Vercel environment variables to ensure the build has access to necessary secrets
+      - name: Pull Vercel Environment Information
+        run: npx vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+
+      # Compiles the project and prepares the build artifacts for deployment to Vercel
+      - name: Build Project Artifacts
+        run: npx vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+
+      # Deploys the vuild to Vercel
+      - name: Deploy Project Artifacts to Vercel
+        run: npx vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
