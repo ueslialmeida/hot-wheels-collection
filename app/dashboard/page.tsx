@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Car, Search, Plus, Calendar, Palette, ListOrdered, Frown } from 'lucide-react'; // Adicionei o ícone Frown para a busca vazia
+import { Car, Search, Plus, Calendar, Palette, ListOrdered, Frown } from 'lucide-react';
 import { CarFormData } from '../types/Car';
 import { signOut } from '../auth/logout/action';
 import { getCarsInCollection } from './actions';
@@ -143,7 +143,7 @@ export default function HotWheelsDashboard() {
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 mt-auto">
-                  <div className="bg-slate-100 p-3 rounded-2xl border border-slate-200">
+                  <div className="bg-slate-50 p-3 rounded-2xl border border-slate-100">
                     <div className="flex items-center gap-2 text-slate-500 mb-1">
                       <Calendar size={14} />
                       <span className="text-[10px] font-bold uppercase">Ano</span>
@@ -151,7 +151,7 @@ export default function HotWheelsDashboard() {
                     <span className="text-sm font-bold text-slate-700">{car.collectionYear}</span>
                   </div>
 
-                  <div className="bg-slate-100 p-3 rounded-2xl border border-slate-200">
+                  <div className="bg-slate-50 p-3 rounded-2xl border border-slate-100">
                     <div className="flex items-center gap-2 text-slate-500 mb-1">
                       <ListOrdered size={14} />
                       <span className="text-[10px] font-bold uppercase">Na Série</span>
