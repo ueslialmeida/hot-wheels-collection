@@ -2,6 +2,7 @@ const { defineConfig } = require('cypress')
 require('dotenv').config({ path: './.env.local' })
 
 module.exports = defineConfig({
+  projectId: "hjgm2f",
   allowCypressEnv: false,
   watchForFileChanges: false,
   viewportWidth: 1920,
