@@ -10,6 +10,9 @@ on:
 jobs:
   # --- JOB 1: RUN AUTOMATED TESTS LOCALLY ---
   test:
+    # Skip if the PR is only for documentation changes
+    if: "!startsWith(github.head_ref, 'docs/')"
+
     runs-on: ubuntu-latest
     
     env:
