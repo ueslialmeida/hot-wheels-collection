@@ -68,7 +68,7 @@ export default function HotWheelsDashboard() {
             <input 
               id="search"
               type="text" 
-              value={searchTerm}
+              value={searchTerm ?? ''}
               placeholder="Buscar por modelo ou código..." 
               className="pl-10 pr-4 py-3 bg-white border-2 border-slate-200 rounded-xl focus:border-orange-500 outline-none transition-all w-full md:w-80 shadow-sm"
               onChange={(e) => setSearchTerm(e.target.value)}
