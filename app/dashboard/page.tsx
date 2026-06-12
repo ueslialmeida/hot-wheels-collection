@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Car, Search, Plus, Calendar, Palette, ListOrdered, Frown } from 'lucide-react';
+import { Car, Search, Plus, Calendar, Palette, ListOrdered, Frown, X } from 'lucide-react';
 import { CarFormData } from '../types/Car';
 import { signOut } from '../auth/logout/action';
 import { getCarsInCollection } from './actions';
@@ -66,12 +66,24 @@ export default function HotWheelsDashboard() {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
             <input 
-            id="search"
+              id="search"
               type="text" 
+              value={searchTerm}
               placeholder="Buscar por modelo ou código..." 
               className="pl-10 pr-4 py-3 bg-white border-2 border-slate-200 rounded-xl focus:border-orange-500 outline-none transition-all w-full md:w-80 shadow-sm"
               onChange={(e) => setSearchTerm(e.target.value)}
             />
+            {searchTerm && (
+              <button
+                id="btn-clear-search"
+                type="button"
+                onClick={() => setSearchTerm('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors p-0.5 rounded-full hover:bg-slate-100"
+                title="Limpar busca"
+              >
+                <X size={22} />
+              </button>
+            )}
           </div>
           <button id="add-new-car" onClick={() => {setSelectedCar(null); setIsModalOpen(true);}} className="bg-slate-900 text-white px-6 py-3 rounded-xl font-bold hover:bg-orange-600 transition-colors flex items-center gap-2 shadow-lg">
             <Plus size={20} /> Adicionar

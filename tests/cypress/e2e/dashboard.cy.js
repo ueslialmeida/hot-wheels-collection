@@ -118,7 +118,7 @@ describe('Tests for the dashboard module', () => {
         cy.wait(500)
         cy.addNewCar(testCar)
         cy.get('#search').type(testCar.model)
-        cy.get('#search').clear()
+        cy.get('#btn-clear-search').click()
 
         cy.get('h2').should('contain', testCar.model)
 
