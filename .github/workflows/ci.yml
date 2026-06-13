@@ -35,9 +35,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Force Cypress Binary Installation
-        run: npx cypress install
-
       - name: Supabase start
         uses: supabase/setup-cli@v1
         with:
