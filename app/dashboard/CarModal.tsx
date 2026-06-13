@@ -6,6 +6,13 @@ import { useForm } from 'react-hook-form';
 import { CarFormData } from '../types/Car';
 import { addCarToCollection, updateCarInCollection, deleteCarFromCollection } from './actions';
 
+// Hot Wheels Mattel Base Code mapping (Letter -> Production Year)
+const hotWheelsLetters: Record<string, number> = {
+  A: 2008, B: 2009, C: 2010, D: 2011, E: 2012, F: 2013, G: 2014, H: 2015,
+  J: 2016, K: 2017, L: 2018, M: 2019, N: 2020, P: 2021, R: 2022, S: 2023,
+  T: 2024, U: 2025, V: 2026, W: 2027, X: 2028, Y: 2029, Z: 2030
+};
+
 interface CarModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -18,8 +25,9 @@ export default function CarModal({ isOpen, onClose, initialData, onSuccess, onDe
   const isEditing = !!initialData;
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
+  const [showHelp, setShowHelp] = useState(false); // Controls the visibility of the interactive decoder popover
   
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<CarFormData>(
+  const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<CarFormData>(
     {
       shouldUnregister: true, // Unregister inputs when unmounted to prevent stale data
       defaultValues: initialData || {}
@@ -31,6 +39,7 @@ export default function CarModal({ isOpen, onClose, initialData, onSuccess, onDe
     if (isOpen) {
       setIsConfirmingDelete(false);
       setServerError(null); // Clears previous server errors on new submission attempt
+      setShowHelp(false); // Closes the decoder popover when reopening the modal
       if (initialData) {
         reset(initialData);
       } else {
@@ -192,13 +201,58 @@ export default function CarModal({ isOpen, onClose, initialData, onSuccess, onDe
                   </div>
                 </div>
 
-                {/* Collection Year field */}
-                <div>
-                  <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Ano de Lançamento</label>
+                {/* Collection Year field with inline decoder pop-over */}
+                <div className="relative">
+                  <div className="flex justify-between items-center mb-2 ml-1">
+                    <label className="block text-xs font-bold text-slate-500 uppercase">
+                      Ano de Lançamento
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setShowHelp(!showHelp)}
+                      className="text-xs text-orange-500 hover:text-orange-600 font-semibold transition-colors focus:outline-none"
+                    >
+                      {showHelp ? 'Ocultar ajuda' : 'Descobrir por código'}
+                    </button>
+                  </div>
+
                   <div className="relative">
                     <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                    <input id="collection-year" {...register('collectionYear')} type="number" className="w-full pl-10 pr-4 py-2.5 md:py-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-orange-500 outline-none transition-all text-sm md:text-base" placeholder="2024" />
+                    <input 
+                      id="collection-year" 
+                      {...register('collectionYear')} 
+                      type="number" 
+                      className="w-full pl-10 pr-4 py-2.5 md:py-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-orange-500 outline-none transition-all text-sm md:text-base" 
+                      placeholder="2024" 
+                    />
                   </div>
+
+                  {/* Interactive floating matrix pop-over for casting code helper */}
+                  {showHelp && (
+                    <div className="absolute left-0 right-0 z-10 mt-2 bg-white border border-slate-200 rounded-2xl p-4 shadow-xl space-y-3 animate-in fade-in slide-in-from-top-2 duration-200">
+                      <p className="text-[11px] md:text-xs text-slate-500 leading-relaxed">
+                        Toque na <strong>primeira letra</strong> do código em relevo localizado na base do carrinho (ex: <span className="font-bold text-orange-600 bg-orange-50 px-1 rounded font-mono">N</span>27) para definir o ano correspondente:
+                      </p>
+                      
+                      {/* Compact scrolling button pad for mobile-first selection */}
+                      <div className="grid grid-cols-5 gap-1.5 max-h-32 overflow-y-auto p-1.5 bg-slate-50 rounded-xl border border-slate-100">
+                        {Object.entries(hotWheelsLetters).map(([letter, year]) => (
+                          <button
+                            key={letter}
+                            type="button"
+                            onClick={() => {
+                              setValue('collectionYear', year);
+                              setShowHelp(false); // Auto-dismiss pop-over after setting the value safely
+                            }}
+                            className="flex flex-col items-center justify-center py-1.5 bg-white border border-slate-150 rounded-lg hover:border-orange-500 hover:text-orange-600 transition-all active:scale-95 shadow-2xs"
+                          >
+                            <span className="text-xs font-mono font-bold uppercase text-slate-700">{letter}</span>
+                            <span className="text-[9px] text-slate-400 font-medium">{year}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Serie / Collection field */}
@@ -266,7 +320,6 @@ export default function CarModal({ isOpen, onClose, initialData, onSuccess, onDe
                 id="cancel"
                 type="button"
                 onClick={onClose}
-                // Altura controlada no desktop e paddings mais discretos
                 className="flex-1 h-12 md:h-11 bg-white border border-slate-200 text-slate-600 font-bold rounded-xl md:rounded-2xl hover:bg-slate-50 transition-colors uppercase text-xs md:text-sm tracking-wider md:tracking-widest"
               >
                 Cancelar
@@ -275,10 +328,8 @@ export default function CarModal({ isOpen, onClose, initialData, onSuccess, onDe
               <button 
                 id="save"
                 type="submit"
-                // Altura controlada no desktop e flex container para alinhar conteúdo
                 className="flex-1 h-12 md:h-11 bg-orange-500 text-white font-bold rounded-xl md:rounded-2xl hover:bg-orange-600 transition-shadow shadow-lg shadow-orange-200 uppercase text-xs md:text-sm tracking-wider md:tracking-widest flex items-center justify-center gap-2"
               >
-                {/* Ícone menor e proporcional ao texto no desktop */}
                 <Save size={16} className="md:size-5" /> {isEditing ? 'Salvar' : 'Adicionar'}
               </button>
             </div>
