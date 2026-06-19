@@ -1,7 +1,7 @@
 'use client';
 
 import { useActionState } from 'react';
-import { User, Mail, Lock, ArrowRight, Sparkles } from 'lucide-react';
+import { User, Mail, Lock, ArrowRight, Loader2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -22,8 +22,7 @@ export default function RegisterPage() {
 
   const {
     register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
   });
@@ -55,7 +54,7 @@ export default function RegisterPage() {
           )}
         </div>
 
-        <form className="mt-8 space-y-5" >
+        <form className="mt-8 space-y-5" action={formAction}>
           <div className="space-y-4">
             {/* Name field */}
             <div>
@@ -68,9 +67,10 @@ export default function RegisterPage() {
                 id='name'
                 type="text"
                 required
+                disabled={isPending}
                   {...register('name')}
                   className={`block text-slate-800 w-full pl-10 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 transition-all sm:text-sm
-                    ${errors.name ? 'border-red-500 focus:ring-red-200' : 'border-slate-300 focus:ring-blue-500 focus:border-transparent'}`}
+                    ${errors.name ? 'border-red-500 focus:ring-red-200' : 'border-slate-300 focus:ring-blue-500 focus:border-transparent'} disabled:opacity-50`}
                   placeholder="Seu nome"
                 />
               </div>
@@ -89,8 +89,9 @@ export default function RegisterPage() {
                   {...register('email')}
                   type="email"
                   required
+                  disabled={isPending}
                   className={`block text-slate-800 w-full pl-10 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 transition-all sm:text-sm
-                    ${errors.email ? 'border-red-500 focus:ring-red-200' : 'border-slate-300 focus:ring-blue-500 focus:border-transparent'}`}
+                    ${errors.email ? 'border-red-500 focus:ring-red-200' : 'border-slate-300 focus:ring-blue-500 focus:border-transparent'} disabled:opacity-50`}
                   placeholder="exemplo@email.com"
                 />
               </div>
@@ -109,8 +110,9 @@ export default function RegisterPage() {
                   {...register('password')}
                   type="password"
                   required
+                  disabled={isPending}
                   className={`block text-slate-800 w-full pl-10 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 transition-all sm:text-sm
-                    ${errors.password ? 'border-red-500 focus:ring-red-200' : 'border-slate-300 focus:ring-blue-500 focus:border-transparent'}`}
+                    ${errors.password ? 'border-red-500 focus:ring-red-200' : 'border-slate-300 focus:ring-blue-500 focus:border-transparent'} disabled:opacity-50`}
                   placeholder="No mínimo 8 caracteres"
                 />
               </div>
@@ -120,13 +122,21 @@ export default function RegisterPage() {
 
           <button
           id='register-button'
-            formAction={formAction}
             type="submit"
-            disabled={isSubmitting}
-            className="group relative w-full flex justify-center py-2.5 px-4 border border-transparent text-sm font-semibold rounded-lg text-white bg-slate-900 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed"
+            disabled={isPending}
+            className="group relative w-full flex justify-center py-2.5 px-4 border border-transparent text-sm font-semibold rounded-lg text-white bg-slate-900 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 disabled:bg-slate-400 disabled:cursor-not-allowed"
           >
-            {isSubmitting ? 'Criando conta...' : 'Cadastrar agora'}
-            {!isSubmitting && <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />}
+            {isPending ? (
+                <>
+                  Criando conta...
+                  <Loader2 className="ml-2 h-5 w-5 animate-spin" />
+                </>
+              ) : (
+                <>
+                  Cadastrar agora
+                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-200" />
+                </>
+              )}
           </button>
         </form>
 
