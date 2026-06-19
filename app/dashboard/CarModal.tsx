@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { X, Save, Car, Hash, Calendar, Layers, Palette, ListOrdered, Tag, FileImage, Trash2, TriangleAlert } from 'lucide-react';
+import { X, Save, Car, Hash, Calendar, Layers, Palette, ListOrdered, Tag, FileImage, Trash2, TriangleAlert, Loader2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { CarFormData } from '../types/Car';
 import { addCarToCollection, updateCarInCollection, deleteCarFromCollection } from './actions';
@@ -26,6 +26,8 @@ export default function CarModal({ isOpen, onClose, initialData, onSuccess, onDe
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
   const [showHelp, setShowHelp] = useState(false); // Controls the visibility of the interactive decoder popover
+
+  const [isPending, setIsPending] = useState(false);
   
   const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<CarFormData>(
     {
@@ -40,6 +42,7 @@ export default function CarModal({ isOpen, onClose, initialData, onSuccess, onDe
       setIsConfirmingDelete(false);
       setServerError(null); // Clears previous server errors on new submission attempt
       setShowHelp(false); // Closes the decoder popover when reopening the modal
+      setIsPending(false); // Resets pending state when reopening the modal
       if (initialData) {
         reset(initialData);
       } else {
@@ -63,41 +66,55 @@ export default function CarModal({ isOpen, onClose, initialData, onSuccess, onDe
 
   const onSubmit = async (data: CarFormData) => {
     setServerError(null); // Clears previous server errors on new submission attempt
+    setIsPending(true); // Sets pending state to disable form inputs and buttons during submission
 
-    if (isEditing) {
+    try {
+      if (isEditing) {
       const updatedCar = await updateCarInCollection(data);
       
       // Data validation from backend when editing
       if (updatedCar && 'success' in updatedCar && !updatedCar.success) {
         setServerError(updatedCar.error || "Erro ao atualizar o carrinho.");
+        setIsPending(false); // Re-enables the form for correction
         return;
       }
       
       onSuccess(data, isEditing);
-    } else {
-      const savedCar = await addCarToCollection(data);
-      
-      // Data validation from backend when adding a new car
-      if (savedCar && 'success' in savedCar) {
-        if (!savedCar.success) {
-          setServerError(savedCar.error || "Erro ao salvar o carrinho.");
-          return;
-        }
       } else {
-        onSuccess(savedCar as CarFormData, isEditing);
+        const savedCar = await addCarToCollection(data);
+        
+        // Data validation from backend when adding a new car
+        if (savedCar && 'success' in savedCar) {
+          if (!savedCar.success) {
+            setServerError(savedCar.error || "Erro ao salvar o carrinho.");
+            setIsPending(false);
+            return;
+          }
+        } else {
+          onSuccess(savedCar as CarFormData, isEditing);
+        }
       }
+      
+      reset(); // Clear the form
+      onClose(); // Closes the modal
+    } catch (error) {
+      setServerError("Ocorreu um erro inesperado na operação.");
+      setIsPending(false);
     }
-    
-    reset(); // Clear the form
-    onClose(); // Closes the modal
   };
 
   const handleDelete = async () => {
     if (initialData?.id) {
-      await deleteCarFromCollection(initialData.id);
-      onDeleteSuccess(initialData.id);
-      reset();
-      onClose();
+      setIsPending(true); // Sets pending state to disable form inputs and buttons during deletion
+      try {
+        await deleteCarFromCollection(initialData.id);
+        onDeleteSuccess(initialData.id);
+        reset();
+        onClose();
+      } catch (error) {
+        setServerError("Erro ao tentar remover o carrinho.");
+        setIsPending(false);
+      }
     }
   };
 
@@ -118,7 +135,11 @@ export default function CarModal({ isOpen, onClose, initialData, onSuccess, onDe
                 : isEditing ? `Editando: ${initialData?.modelName}` : 'Novo na Garagem'}
             </h2>
           </div>
-          <button id="close-modal" onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors">
+          <button 
+            id="close-modal" 
+            onClick={onClose} 
+            disabled={isPending} 
+            className="p-2 hover:bg-white/10 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
             <X size={22} className="md:size-6" />
           </button>
         </div>
@@ -142,18 +163,27 @@ export default function CarModal({ isOpen, onClose, initialData, onSuccess, onDe
               <button 
                 id="cancel-delete"
                 type="button"
+                disabled={isPending}
                 onClick={() => setIsConfirmingDelete(false)}
-                className="flex-1 py-3 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition-colors uppercase text-xs tracking-wider"
+                className="flex-1 py-3 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition-colors uppercase text-xs tracking-wider disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Não, voltar
               </button>
               <button 
                 id="confirm-delete"
                 type="button"
+                disabled={isPending}
                 onClick={handleDelete}
-                className="flex-1 py-3 bg-red-500 text-white font-bold rounded-xl hover:bg-red-600 transition-colors shadow-lg shadow-red-200 uppercase text-xs tracking-wider"
+                className="flex-1 py-3 bg-red-500 text-white font-bold rounded-xl hover:bg-red-600 transition-colors shadow-lg shadow-red-200 uppercase text-xs tracking-wider flex items-center justify-center gap-2 disabled:bg-red-400 disabled:cursor-not-allowed"
               >
-                Sim, remover
+                {isPending ? (
+                  <>
+                    Removendo...
+                    <Loader2 size={16} className="animate-spin" />
+                  </>
+                ) : (
+                  'Sim, remover'
+                )}
               </button>
             </div>
           </div>
@@ -178,7 +208,11 @@ export default function CarModal({ isOpen, onClose, initialData, onSuccess, onDe
                   <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">ID do Registro</label>
                   <div className="relative">
                     <Tag className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                    <input id="register-id" {...register('id')} className="w-full pl-10 pr-4 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-orange-500 outline-none transition-all" />
+                    <input 
+                      id="register-id" 
+                      {...register('id')} 
+                      disabled={isPending} 
+                      className="w-full pl-10 pr-4 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-orange-500 outline-none transition-all" />
                   </div>
                 </div>
                 
@@ -187,7 +221,12 @@ export default function CarModal({ isOpen, onClose, initialData, onSuccess, onDe
                   <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Nome do Modelo <span className="text-red-500">*</span></label>
                   <div className="relative">
                     <Tag className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                    <input id="model-name" {...register('modelName', { required: true })} className="w-full pl-10 pr-4 py-2.5 md:py-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-orange-500 outline-none transition-all text-sm md:text-base" placeholder="Ex: Nissan Skyline GT-R (R34)" />
+                    <input 
+                      id="model-name" 
+                      {...register('modelName', { required: true })} 
+                      disabled={isPending} 
+                      className="w-full pl-10 pr-4 py-2.5 md:py-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-orange-500 outline-none transition-all text-sm md:text-base disabled:opacity-60" 
+                      placeholder="Ex: Nissan Skyline GT-R (R34)" />
                   </div>
                   {errors.modelName && <span className="text-xs text-red-500 mt-1 ml-1 block">Este campo é obrigatório.</span>}
                 </div>
@@ -197,7 +236,12 @@ export default function CarModal({ isOpen, onClose, initialData, onSuccess, onDe
                   <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Código do Modelo</label>
                   <div className="relative">
                     <Hash className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                    <input id="model-code" {...register('modelCode')} className="w-full pl-10 pr-4 py-2.5 md:py-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-orange-500 outline-none transition-all text-sm md:text-base" placeholder="Ex: HNK34" />
+                    <input 
+                      id="model-code" 
+                      {...register('modelCode')} 
+                      disabled={isPending} 
+                      className="w-full pl-10 pr-4 py-2.5 md:py-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-orange-500 outline-none transition-all text-sm md:text-base disabled:opacity-60" 
+                      placeholder="Ex: HNK34" />
                   </div>
                 </div>
 
@@ -209,8 +253,9 @@ export default function CarModal({ isOpen, onClose, initialData, onSuccess, onDe
                     </label>
                     <button
                       type="button"
+                      disabled={isPending} 
                       onClick={() => setShowHelp(!showHelp)}
-                      className="text-xs text-orange-500 hover:text-orange-600 font-semibold transition-colors focus:outline-none"
+                      className="text-xs text-orange-500 hover:text-orange-600 font-semibold transition-colors focus:outline-none disabled:opacity-40"
                     >
                       {showHelp ? 'Ocultar ajuda' : 'Descobrir por código'}
                     </button>
@@ -222,13 +267,14 @@ export default function CarModal({ isOpen, onClose, initialData, onSuccess, onDe
                       id="collection-year" 
                       {...register('collectionYear')} 
                       type="number" 
-                      className="w-full pl-10 pr-4 py-2.5 md:py-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-orange-500 outline-none transition-all text-sm md:text-base" 
+                      disabled={isPending}
+                      className="w-full pl-10 pr-4 py-2.5 md:py-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-orange-500 outline-none transition-all text-sm md:text-base disabled:opacity-60" 
                       placeholder="2024" 
                     />
                   </div>
 
                   {/* Interactive floating matrix pop-over for casting code helper */}
-                  {showHelp && (
+                  {showHelp && !isPending && (
                     <div className="absolute left-0 right-0 z-10 mt-2 bg-white border border-slate-200 rounded-2xl p-4 shadow-xl space-y-3 animate-in fade-in slide-in-from-top-2 duration-200">
                       <p className="text-[11px] md:text-xs text-slate-500 leading-relaxed">
                         Toque na <strong>primeira letra</strong> do código em relevo localizado na base do carrinho (ex: <span className="font-bold text-orange-600 bg-orange-50 px-1 rounded font-mono">N</span>27) para definir o ano correspondente:
@@ -260,7 +306,12 @@ export default function CarModal({ isOpen, onClose, initialData, onSuccess, onDe
                   <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Série / Coleção</label>
                   <div className="relative">
                     <Layers className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                    <input id="serie" {...register('serie')} className="w-full pl-10 pr-4 py-2.5 md:py-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-orange-500 outline-none transition-all text-sm md:text-base" placeholder="Ex: J-Imports" />
+                    <input 
+                      id="serie" 
+                      {...register('serie')} 
+                      disabled={isPending} 
+                      className="w-full pl-10 pr-4 py-2.5 md:py-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-orange-500 outline-none transition-all text-sm md:text-base disabled:opacity-60" 
+                      placeholder="Ex: J-Imports" />
                   </div>
                 </div>
 
@@ -269,7 +320,12 @@ export default function CarModal({ isOpen, onClose, initialData, onSuccess, onDe
                   <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Cor Predominante</label>
                   <div className="relative">
                     <Palette className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                    <input id="color" {...register('color')} className="w-full pl-10 pr-4 py-2.5 md:py-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-orange-500 outline-none transition-all text-sm md:text-base" placeholder="Ex: Bayside Blue" />
+                    <input 
+                      id="color" 
+                      {...register('color')} 
+                      disabled={isPending} 
+                      className="w-full pl-10 pr-4 py-2.5 md:py-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-orange-500 outline-none transition-all text-sm md:text-base disabled:opacity-60" 
+                      placeholder="Ex: Bayside Blue" />
                   </div>
                 </div>
 
@@ -278,7 +334,12 @@ export default function CarModal({ isOpen, onClose, initialData, onSuccess, onDe
                   <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Número Anual</label>
                   <div className="relative">
                     <ListOrdered className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                    <input id="number-in-year-collection" {...register('numberInYearCollection')} className="w-full pl-10 pr-4 py-2.5 md:py-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-orange-500 outline-none transition-all text-sm md:text-base" placeholder="000/250" />
+                    <input 
+                      id="number-in-year-collection" 
+                      {...register('numberInYearCollection')} 
+                      disabled={isPending} 
+                      className="w-full pl-10 pr-4 py-2.5 md:py-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-orange-500 outline-none transition-all text-sm md:text-base disabled:opacity-60" 
+                      placeholder="000/250" />
                   </div>
                 </div>
 
@@ -287,7 +348,12 @@ export default function CarModal({ isOpen, onClose, initialData, onSuccess, onDe
                   <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Número na Série</label>
                   <div className="relative">
                     <ListOrdered className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                    <input id="number-in-serie" {...register('numberInSerie')} className="w-full pl-10 pr-4 py-2.5 md:py-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-orange-500 outline-none transition-all text-sm md:text-base" placeholder="0/10" />
+                    <input 
+                      id="number-in-serie" 
+                      {...register('numberInSerie')} 
+                      disabled={isPending} 
+                      className="w-full pl-10 pr-4 py-2.5 md:py-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-orange-500 outline-none transition-all text-sm md:text-base disabled:opacity-60" 
+                      placeholder="0/10" />
                   </div>
                 </div>
 
@@ -296,7 +362,12 @@ export default function CarModal({ isOpen, onClose, initialData, onSuccess, onDe
                   <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">URL da Imagem</label>
                   <div className="relative">
                     <FileImage className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                    <input id="image-url" {...register('imageUrl')} className="w-full pl-10 pr-4 py-2.5 md:py-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-orange-500 outline-none transition-all text-sm md:text-base" placeholder="https://example.com/image.jpg" />
+                    <input 
+                      id="image-url" 
+                      {...register('imageUrl')} 
+                      disabled={isPending} 
+                      className="w-full pl-10 pr-4 py-2.5 md:py-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-orange-500 outline-none transition-all text-sm md:text-base disabled:opacity-60" 
+                      placeholder="https://example.com/image.jpg" />
                   </div>
                 </div>
               </div>
@@ -308,8 +379,9 @@ export default function CarModal({ isOpen, onClose, initialData, onSuccess, onDe
                 <button 
                   id="delete"
                   type="button"
+                  disabled={isPending}
                   onClick={() => setIsConfirmingDelete(true)}
-                  className="text-red-500 font-bold hover:text-red-600 transition-colors p-2.5 rounded-xl hover:bg-red-50 shrink-0"
+                  className="text-red-500 font-bold hover:text-red-600 transition-colors p-2.5 rounded-xl hover:bg-red-50 shrink-0 disabled:opacity-40 disabled:cursor-not-allowed"
                   title="Remover carrinho"
                 >
                   <Trash2 size={24} className="md:size-[26px]" />
@@ -319,8 +391,9 @@ export default function CarModal({ isOpen, onClose, initialData, onSuccess, onDe
               <button 
                 id="cancel"
                 type="button"
+                disabled={isPending} 
                 onClick={onClose}
-                className="flex-1 h-12 md:h-11 bg-white border border-slate-200 text-slate-600 font-bold rounded-xl md:rounded-2xl hover:bg-slate-50 transition-colors uppercase text-xs md:text-sm tracking-wider md:tracking-widest"
+                className="flex-1 h-12 md:h-11 bg-white border border-slate-200 text-slate-600 font-bold rounded-xl md:rounded-2xl hover:bg-slate-50 transition-colors uppercase text-xs md:text-sm tracking-wider md:tracking-widest disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Cancelar
               </button>
@@ -328,9 +401,20 @@ export default function CarModal({ isOpen, onClose, initialData, onSuccess, onDe
               <button 
                 id="save"
                 type="submit"
-                className="flex-1 h-12 md:h-11 bg-orange-500 text-white font-bold rounded-xl md:rounded-2xl hover:bg-orange-600 transition-shadow shadow-lg shadow-orange-200 uppercase text-xs md:text-sm tracking-wider md:tracking-widest flex items-center justify-center gap-2"
+                disabled={isPending}
+                className="flex-1 h-12 md:h-11 bg-orange-500 text-white font-bold rounded-xl md:rounded-2xl hover:bg-orange-600 transition-shadow shadow-lg shadow-orange-200 uppercase text-xs md:text-sm tracking-wider md:tracking-widest flex items-center justify-center gap-2 disabled:bg-orange-400 disabled:cursor-not-allowed"
               >
-                <Save size={16} className="md:size-5" /> {isEditing ? 'Salvar' : 'Adicionar'}
+                {isPending ? (
+                  <>
+                    <Loader2 size={16} className="animate-spin" />
+                    {isEditing ? 'Salvando...' : 'Adicionando...'}
+                  </>
+                ) : (
+                  <>
+                    <Save size={16} className="md:size-5" /> 
+                    {isEditing ? 'Salvar' : 'Adicionar'}
+                  </>
+                )}
               </button>
             </div>
           </form>
