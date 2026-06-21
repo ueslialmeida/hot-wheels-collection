@@ -3,7 +3,7 @@
 import { getSupabaseServerClient } from "@/lib/supabase/server-client"
 import { revalidatePath } from "next/cache"
 import { CarFormData } from "../types/Car"
-import { validateCarData, sanitizeNumber } from "../../utils/validateCar"
+import { validateCarData, sanitizeNumber } from "@/utils/validateCar"
 
 export async function addCarToCollection(carData: CarFormData) {
     const supabase = await getSupabaseServerClient()
