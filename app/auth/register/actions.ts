@@ -27,11 +27,11 @@ export async function signup(prevState: ActionState | undefined, formData: FormD
   }
 
   const data = {
-    email: formData.get('email') as string,
+    email: (formData.get('email') as string)?.toLowerCase().trim(),
     password: formData.get('password') as string,
     options: {
       data: {
-        display_name: formData.get('name') as string,
+        display_name: (formData.get('name') as string)?.trim(),
       }
     }
   }

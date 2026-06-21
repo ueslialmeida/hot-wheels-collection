@@ -3,9 +3,11 @@ export interface CarFormData {
   modelName: string;
   modelCode: string;
   collectionYear: number;
-  serie: string;
+  series: string;
   color: string;
-  numberInYearCollection: string;
-  numberInSerie: string;
+  numberInYearCollection: number;
+  yearCollectionTotal: number;
+  numberInSeries: number;
+  seriesCollectionTotal: number;
   imageUrl: string;
 }

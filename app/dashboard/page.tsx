@@ -129,7 +129,7 @@ export default function HotWheelsDashboard() {
               {/* Top Bar */}
               <div className="bg-slate-900 p-4 flex justify-between items-center z-10">
                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Código: {car.modelCode}</span>
-                <span className="text-orange-500 font-black text-sm italic">{car.numberInYearCollection}</span>
+                <span className="text-orange-500 font-black text-sm italic">{car.numberInYearCollection}/{car.yearCollectionTotal}</span>
               </div>
 
               {/* Car picture */}
@@ -140,7 +140,7 @@ export default function HotWheelsDashboard() {
                   <Car size={80} className="text-slate-300 group-hover:text-orange-400 group-hover:scale-110 transition-all duration-500" />
                 )}
                 <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold shadow-sm">
-                  SERIE: {car.serie.toUpperCase()}
+                  SERIE: {car.series.toUpperCase()}
                 </div>
               </div>
 
@@ -168,7 +168,7 @@ export default function HotWheelsDashboard() {
                       <ListOrdered size={14} />
                       <span className="text-[10px] font-bold uppercase">Na Série</span>
                     </div>
-                    <span className="text-sm font-bold text-slate-700">{car.numberInSerie}</span>
+                    <span className="text-sm font-bold text-slate-700">{car.numberInSeries}/{car.seriesCollectionTotal}</span>
                   </div>
                 </div>
               </div>

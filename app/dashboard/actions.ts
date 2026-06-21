@@ -3,6 +3,7 @@
 import { getSupabaseServerClient } from "@/lib/supabase/server-client"
 import { revalidatePath } from "next/cache"
 import { CarFormData } from "../types/Car"
+import { validateCarData, sanitizeNumber } from "@/utils/validateCar"
 
 export async function addCarToCollection(carData: CarFormData) {
     const supabase = await getSupabaseServerClient()
@@ -14,23 +15,22 @@ export async function addCarToCollection(carData: CarFormData) {
         return { success: false, error: authError?.message }
     }
 
-    if (!carData.modelName) {
-        return { success: false, error: "O nome do modelo é obrigatório." }
-    }
-
-    if ((isNaN(carData.collectionYear) || carData.collectionYear < 1900 || carData.collectionYear > new Date().getFullYear())) {
-        return { success: false, error: "O ano da coleção é inválido." }
+    const validation = validateCarData(carData)
+    if (!validation.isValid) {
+        return { success: false, error: validation.error }
     }
 
     const car = {
-        model_name: carData.modelName as string,
-        model_code: carData.modelCode as string,
-        in_year_collection_number: carData.numberInYearCollection as string,
-        in_series_collection_number: carData.numberInSerie as string,
-        color: carData.color as string,
-        image_url: carData.imageUrl as string,
-        series_title: carData.serie as string,
-        collection_year: Number(carData.collectionYear),
+        model_name: (carData.modelName as string)?.trim(),
+        model_code: (carData.modelCode as string)?.toUpperCase().trim(),
+        year_collection_number: sanitizeNumber(carData.numberInYearCollection),
+        year_collection_total: sanitizeNumber(carData.yearCollectionTotal),
+        series_collection_number: sanitizeNumber(carData.numberInSeries),
+        series_collection_total: sanitizeNumber(carData.seriesCollectionTotal),
+        color: (carData.color as string)?.trim(),
+        image_url: (carData.imageUrl as string)?.trim(),
+        series_title: (carData.series as string)?.trim(),
+        collection_year: sanitizeNumber(carData.collectionYear),
         user_id: user.id
     }
 
@@ -45,20 +45,22 @@ export async function addCarToCollection(carData: CarFormData) {
         return { success: false, error: error.message }
     }
 
-    // Mapeia o retorno do banco para o padrão da sua interface
+    // Maps the data to the format expected by the frontend
     const mappedNewCar: CarFormData = {
         id: newCar.id,
         modelName: newCar.model_name,
         modelCode: newCar.model_code,
         collectionYear: newCar.collection_year,
-        serie: newCar.series_title,
+        series: newCar.series_title,
         color: newCar.color,
         imageUrl: newCar.image_url,
-        numberInYearCollection: newCar.in_year_collection_number,
-        numberInSerie: newCar.in_series_collection_number
+        numberInYearCollection: newCar.year_collection_number,
+        yearCollectionTotal: newCar.year_collection_total,
+        numberInSeries: newCar.series_collection_number,
+        seriesCollectionTotal: newCar.series_collection_total
     };
 
-    // Atualiza a página de listagem para mostrar o novo carrinho imediatamente
+    // Updates the listing page to show the new car immediately
     revalidatePath('/dashboard')
     return mappedNewCar
 }
@@ -75,16 +77,18 @@ export async function getCarsInCollection() {
         return { success: false, error: 'Não foi possível carregar a sua coleção.' }
     }
 
-    // Mapear os dados para o formato esperado pelo frontend
+    // Maps the data to the format expected by the frontend
     const mappedCars = cars.map(car => ({
         id: car.id,
         modelName: car.model_name,
         modelCode: car.model_code,
-        numberInYearCollection: car.in_year_collection_number,
-        numberInSerie: car.in_series_collection_number,
+        numberInYearCollection: car.year_collection_number,
+        yearCollectionTotal: car.year_collection_total,
+        numberInSeries: car.series_collection_number,
+        seriesCollectionTotal: car.series_collection_total,
         color: car.color,
         imageUrl: car.image_url,
-        serie: car.series_title,
+        series: car.series_title,
         collectionYear: car.collection_year
     }))
 
@@ -98,25 +102,24 @@ export async function updateCarInCollection(carData: CarFormData) {
         return { success: false, error: "ID do carrinho é necessário para atualização." }
     }
 
-    if (!carData.modelName) {
-        return { success: false, error: "O nome do modelo é obrigatório." }
-    }
-
-    if ((isNaN(carData.collectionYear) || carData.collectionYear < 1900 || carData.collectionYear > new Date().getFullYear())) {
-        return { success: false, error: "O ano da coleção é inválido." }
+    const validation = validateCarData(carData)
+    if (!validation.isValid) {
+        return { success: false, error: validation.error }
     }
 
     const { error } = await supabase
         .from('cars')
         .update({
-            model_name: carData.modelName,
-            model_code: carData.modelCode,
-            in_year_collection_number: carData.numberInYearCollection,
-            in_series_collection_number: carData.numberInSerie,
-            color: carData.color,
-            image_url: carData.imageUrl,
-            series_title: carData.serie,
-            collection_year: carData.collectionYear
+            model_name: (carData.modelName as string)?.trim(),
+            model_code: (carData.modelCode as string)?.toUpperCase().trim(),
+            year_collection_number: sanitizeNumber(carData.numberInYearCollection),
+            year_collection_total: sanitizeNumber(carData.yearCollectionTotal),
+            series_collection_number: sanitizeNumber(carData.numberInSeries),
+            series_collection_total: sanitizeNumber(carData.seriesCollectionTotal),
+            color: (carData.color as string)?.trim(),
+            image_url: (carData.imageUrl as string)?.trim(),
+            series_title: (carData.series as string)?.trim(),
+            collection_year: sanitizeNumber(carData.collectionYear)
         })
         .eq('id', carData.id)
 
