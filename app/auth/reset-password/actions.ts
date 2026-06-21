@@ -20,7 +20,7 @@ export async function resetPassword(prevState: ActionState | undefined, formData
     }
 
     const data = {
-        email: formData.get('email') as string,
+        email: (formData.get('email') as string)?.toLowerCase().trim(),
     }
 
     const{ error } = await supabase.auth.resetPasswordForEmail(data.email, {

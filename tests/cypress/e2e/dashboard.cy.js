@@ -8,8 +8,10 @@ describe('Tests for the dashboard module', () => {
         year: '2024',
         series: 'J-Imports',
         color: 'Black',
-        numInCollection: '42/250',
-        numInSeries: '2/5',
+        numInCollection: '42',
+        yearCollectionTotal: '250',
+        numInSeries: '2',
+        seriesCollectionTotal: '5',
     }
 
     const testCarWithImage = {
@@ -155,12 +157,48 @@ describe('Tests for the dashboard module', () => {
         cy.get('#collection-year').type('1899')
         cy.get('#save').click()
 
-        cy.get('p').should('contain', 'O ano da coleção é inválido.')
+        cy.get('p').should('contain', 'O ano da coleção é inválido. Valores permitidos: 1900 até o ano atual.')
 
         cy.get('#collection-year').clear().type(nextYear)
         cy.get('#save').click()
         
-        cy.get('p').should('contain', 'O ano da coleção é inválido.')
+        cy.get('p').should('contain', 'O ano da coleção é inválido. Valores permitidos: 1900 até o ano atual.')
+    })
+
+    it('should not accept value under "1" or over "300" in yearly collection number fields', () => {
+
+        cy.wait(500)
+        cy.get('#add-new-car').click()
+        cy.removeBounderyAttributes(['#number-in-year-collection', '#year-collection-total'])
+        cy.get('#model-name').type(testCar.model)
+        cy.get('#number-in-year-collection').type('0')
+        cy.get('#save').click()
+
+        cy.get('p').should('contain', 'O número na coleção do ano é inválido. Valores permitidos: 1 até 300.')
+
+        cy.get('#number-in-year-collection').clear().type('1')
+        cy.get('#year-collection-total').type('301')
+        cy.get('#save').click()
+        
+        cy.get('p').should('contain', 'O total da coleção do ano é inválido. Valores permitidos: 1 até 300.')
+    })
+
+    it('should not accept value under "1" or over "99" in series collection number fields', () => {
+
+        cy.wait(500)
+        cy.get('#add-new-car').click()
+        cy.removeBounderyAttributes(['#number-in-series', '#series-collection-total'])
+        cy.get('#model-name').type(testCar.model)
+        cy.get('#number-in-series').type('0')
+        cy.get('#save').click()
+
+        cy.get('p').should('contain', 'O número na série é inválido. Valores permitidos: 1 até 99.')
+
+        cy.get('#number-in-series').clear().type('1')
+        cy.get('#series-collection-total').type('100')
+        cy.get('#save').click()
+        
+        cy.get('p').should('contain', 'O total da coleção da série é inválido. Valores permitidos: 1 até 99.')
     })
 
     it('should log out the user and redirect to login page when "Sair da Garagem" button is clicked', () => {

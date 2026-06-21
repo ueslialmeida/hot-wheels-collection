@@ -13,7 +13,7 @@ export async function login(prevState: {error: string | null}, formData: FormDat
     }
 
     const data = {
-        email: formData.get('email') as string,
+        email: (formData.get('email') as string)?.toLowerCase().trim(),
         password: formData.get('password') as string,
     }
 

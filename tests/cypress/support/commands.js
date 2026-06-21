@@ -61,15 +61,24 @@ Cypress.Commands.add('removeRequiredAttribute', (elements) => {
     })
 })
 
+Cypress.Commands.add('removeBounderyAttributes', (elements) => {
+    elements.forEach(element => {
+        cy.get(element).invoke('removeAttr', 'min')
+        cy.get(element).invoke('removeAttr', 'max')
+    })
+})
+
 Cypress.Commands.add('addNewCar', (car) => {
     cy.get('#add-new-car').click()
     cy.get('#model-name').type(car.model)
     cy.get('#model-code').type(car.modelCode)
     cy.get('#collection-year').type(car.year)
-    cy.get('#serie').type(car.series)
+    cy.get('#series').type(car.series)
     cy.get('#color').type(car.color)
     cy.get('#number-in-year-collection').type(car.numInCollection)
-    cy.get('#number-in-serie').type(car.numInSeries)
+    cy.get('#year-collection-total').type(car.yearCollectionTotal)
+    cy.get('#number-in-series').type(car.numInSeries)
+    cy.get('#series-collection-total').type(car.seriesCollectionTotal)
     car.imageUrl && cy.get('#image-url').type(car.imageUrl, {delay: 0})
     cy.get('#save').click()
 })

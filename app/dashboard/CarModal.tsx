@@ -52,10 +52,12 @@ export default function CarModal({ isOpen, onClose, initialData, onSuccess, onDe
           modelName: '',
           modelCode: '',
           collectionYear: undefined,
-          serie: '',
+          series: '',
           color: '',
-          numberInYearCollection: '',
-          numberInSerie: '',
+          numberInYearCollection: undefined,
+          yearCollectionTotal: undefined,
+          numberInSeries: undefined,
+          seriesCollectionTotal: undefined,
           imageUrl: ''
         });
       }
@@ -307,8 +309,8 @@ export default function CarModal({ isOpen, onClose, initialData, onSuccess, onDe
                   <div className="relative">
                     <Layers className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                     <input 
-                      id="serie" 
-                      {...register('serie')} 
+                      id="series" 
+                      {...register('series')} 
                       disabled={isPending} 
                       className="w-full pl-10 pr-4 py-2.5 md:py-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-orange-500 outline-none transition-all text-sm md:text-base disabled:opacity-60" 
                       placeholder="Ex: J-Imports" />
@@ -329,31 +331,74 @@ export default function CarModal({ isOpen, onClose, initialData, onSuccess, onDe
                   </div>
                 </div>
 
-                {/* Number in collection year field */}
+                {/* GROUP: COLLECTION NUMBER */}
                 <div>
                   <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Número Anual</label>
-                  <div className="relative">
-                    <ListOrdered className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                  {/* Input container */}
+                  <div className="relative flex items-center bg-slate-50 border-2 border-slate-100 rounded-xl focus-within:border-orange-500 transition-all px-3 py-2.5 md:py-3 text-sm md:text-base">
+                    <ListOrdered className="text-slate-400 mr-2 flex-shrink-0" size={18} />
+                    
+                    {/* Number in collection year field */}
                     <input 
+                      type="number"
                       id="number-in-year-collection" 
-                      {...register('numberInYearCollection')} 
+                      {...register('numberInYearCollection', { valueAsNumber: true })} 
                       disabled={isPending} 
-                      className="w-full pl-10 pr-4 py-2.5 md:py-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-orange-500 outline-none transition-all text-sm md:text-base disabled:opacity-60" 
-                      placeholder="000/250" />
+                      min="1"
+                      max="300"
+                      placeholder="001"
+                      className="w-full bg-transparent border-none outline-none text-center p-0 focus:ring-0 disabled:opacity-60 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    />
+                    
+                    <span className="text-slate-400 font-medium px-2">/</span>
+                    
+                    {/* Total collection year field */}
+                    <input 
+                      type="number"
+                      id="year-collection-total" 
+                      {...register('yearCollectionTotal', { valueAsNumber: true })} 
+                      disabled={isPending} 
+                      min="1"
+                      max="300"
+                      placeholder="250"
+                      className="w-full bg-transparent border-none outline-none text-center p-0 focus:ring-0 disabled:opacity-60 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    />
                   </div>
                 </div>
 
-                {/* Number in series field */}
+                {/* GROUP: SERIES NUMBER */}
                 <div>
                   <label className="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Número na Série</label>
-                  <div className="relative">
-                    <ListOrdered className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                  {/* Esse container agora finge ser o input visualmente */}
+                  <div className="relative flex items-center bg-slate-50 border-2 border-slate-100 rounded-xl focus-within:border-orange-500 transition-all px-3 py-2.5 md:py-3 text-sm md:text-base">
+                    <ListOrdered className="text-slate-400 mr-2 flex-shrink-0" size={18} />
+                    
+                    {/* Number in series field */}
                     <input 
-                      id="number-in-serie" 
-                      {...register('numberInSerie')} 
+                      type="number"
+                      id="number-in-series" 
+                      {...register('numberInSeries', { valueAsNumber: true })} 
                       disabled={isPending} 
-                      className="w-full pl-10 pr-4 py-2.5 md:py-3 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-orange-500 outline-none transition-all text-sm md:text-base disabled:opacity-60" 
-                      placeholder="0/10" />
+                      min="1"
+                      max="99"
+                      placeholder="01"
+                      className="w-full bg-transparent border-none outline-none text-center p-0 focus:ring-0 disabled:opacity-60 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    />
+                    
+                    {/* Divisor Visual */}
+                    <span className="text-slate-400 font-medium px-2">/</span>
+                    
+                    {/* Total series field */}
+                    <input 
+                      type="number"
+                      id="series-collection-total" 
+                      {...register('seriesCollectionTotal', { valueAsNumber: true })} 
+                      disabled={isPending} 
+                      min="1"
+                      max="99"
+                      placeholder="10"
+                      className="w-full bg-transparent border-none outline-none text-center p-0 focus:ring-0 disabled:opacity-60 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    />
                   </div>
                 </div>
 
