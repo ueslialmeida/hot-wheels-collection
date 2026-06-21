@@ -64,11 +64,13 @@ export function validateCarData(carData: CarFormData): { isValid: boolean; error
       continue;
     }
 
+    const rawValue = rule.value as unknown;
+
     // Validation for cases where the value exists (is not undefined, null, or an empty string).
-    if (rule.value !== undefined && rule.value !== null && rule.value !== "") {
+    if (rawValue !== undefined && rawValue !== null && rawValue !== "") {
       const numValue = Number(rule.value);
 
-      // If the conversion fails (corrupted letters) or exceeds the stipulated limits, return the respective error.
+      // Se a conversão falhar ou estourar os limites estipulados
       if (isNaN(numValue) || numValue < rule.min || numValue > rule.max) {
         return { isValid: false, error: rule.error };
       }
