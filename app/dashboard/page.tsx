@@ -125,7 +125,7 @@ export default function HotWheelsDashboard() {
         ) : (
           // Map through the filtered list of cars instead of the entire collection
           filteredCars.map((car) => (
-            <div key={car.id} className="bg-white rounded-3xl border-2 border-slate-100 shadow-xl overflow-hidden flex flex-col hover:border-orange-200 transition-all">
+            <div key={car.id} className="car-card bg-white rounded-3xl border-2 border-slate-100 shadow-xl overflow-hidden flex flex-col hover:border-orange-200 transition-all">
               {/* Top Bar */}
               <div className="bg-slate-900 p-4 flex justify-between items-center z-10">
                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Código: {car.modelCode}</span>
